@@ -12,9 +12,10 @@
     <RepositoryUrl>https://github.com/cmxl/FFmpeg.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ffmpeg, dotnet, netstandard</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/cmxl/FFmpeg.NET/master/lib/ffmpeg/v4/icon.svg</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/cmxl/FFmpeg.NET/master/lib/ffmpeg/v4/icon.png</PackageIconUrl>
     <Description>.NET wrapper for common ffmpeg tasks.</Description>
     <PackageId>xFFmpeg.NET</PackageId>
+    <Version>1.0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
