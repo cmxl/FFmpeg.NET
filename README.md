@@ -39,7 +39,7 @@ Features
 
 Get started!
 ------------
-Install [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) from TeamCity Package Source using the Package Manager Console with the following command
+Install [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) from nuget.org Package Source using the Package Manager Console with the following command
 
     PM> Install-Package xFFmpeg.NET
 
