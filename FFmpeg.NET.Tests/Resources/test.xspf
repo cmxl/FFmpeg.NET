@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<playlist version="1">
+  <title>Playlist</title>
+  <trackList>
+    <track>
+      <location>file:///../MediaFiles/SampleVideo_1280x720_1mb.mp4</location>
+      <title>SampleVideo_1280x720_1mb.mp4</title>
+      <duration>5310</duration>
+      <extension application="http://www.videolan.org/vlc/playlist/0">
+        <id xmlns="http://www.videolan.org/vlc/playlist/ns/0/">0</id>
+      </extension>
+    </track>
+    <track>
+      <location>file:///../MediaFiles/SampleAudio_0.4mb.mp3</location>
+      <title>SampleAudio_0.4mb.mp3</title>
+      <duration>27740</duration>
+      <extension application="http://www.videolan.org/vlc/playlist/0">
+        <id xmlns="http://www.videolan.org/vlc/playlist/ns/0/">1</id>
+      </extension>
+    </track>
+  </trackList>
+  <extension application="http://www.videolan.org/vlc/playlist/0">
+    <Items>
+      <item tid="0" xmlns="http://www.videolan.org/vlc/playlist/ns/0/" />
+      <item tid="1" xmlns="http://www.videolan.org/vlc/playlist/ns/0/" />
+    </Items>
+  </extension>
+</playlist>
