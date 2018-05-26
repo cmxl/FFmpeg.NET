@@ -14,6 +14,7 @@
     <PackageTags>ffmpeg, dotnet, netstandard</PackageTags>
     <PackageIconUrl></PackageIconUrl>
     <Description>.NET wrapper for common ffmpeg tasks.</Description>
+    <PackageId>xFFmpeg.NET</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
