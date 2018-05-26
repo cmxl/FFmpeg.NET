@@ -151,31 +151,37 @@ public void StartConverting()
     var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");    
 
     var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
-    ffmpeg.ConvertProgressEvent += ConvertProgressEvent;
-    ffmpeg.ConversionCompleteEvent += ConversionCompleteEvent;
+    ffmpeg.Progress += OnProgress;
+    ffmpeg.Data += OnData;
+    ffmpeg.Error += OnError;
+    ffmpeg.Complete += OnComplete;
     ffmpeg.Convert(inputFile, outputFile);
 }
 
-private void ConvertProgressEvent(object sender, ConvertProgressEventArgs e)
+private void OnProgress(object sender, ConversionProgressEventArgs e)
 {
-    Console.WriteLine("\n------------\nConverting...\n------------");
+    Console.WriteLine("[{0} => {1}]", e.Input.FileInfo.Name, e.Output.FileInfo.Name);
     Console.WriteLine("Bitrate: {0}", e.Bitrate);
     Console.WriteLine("Fps: {0}", e.Fps);
     Console.WriteLine("Frame: {0}", e.Frame);
     Console.WriteLine("ProcessedDuration: {0}", e.ProcessedDuration);
-    Console.WriteLine("SizeKb: {0}", e.SizeKb);
+    Console.WriteLine("Size: {0} kb", e.SizeKb);
     Console.WriteLine("TotalDuration: {0}\n", e.TotalDuration);
 }
 
-private void ConversionCompleteEvent(object sender, ConversionCompleteEventArgs e)
+private void OnData(object sender, ConversionDataEventArgs e)
 {
-    Console.WriteLine("\n------------\nConversion complete!\n------------");
-    Console.WriteLine("Bitrate: {0}", e.Bitrate);
-    Console.WriteLine("Fps: {0}", e.Fps);
-    Console.WriteLine("Frame: {0}", e.Frame);
-    Console.WriteLine("ProcessedDuration: {0}", e.ProcessedDuration);
-    Console.WriteLine("SizeKb: {0}", e.SizeKb);
-    Console.WriteLine("TotalDuration: {0}\n", e.TotalDuration);
+    Console.WriteLine("[{0} => {1}]: {2}", e.Input.FileInfo.Name, e.Output.FileInfo.Name, e.Data);
+}
+
+private void OnComplete(object sender, ConversionCompleteEventArgs e)
+{
+    Console.WriteLine("Completed conversion from {0} to {1}", e.Input.FileInfo.FullName, e.Output.FileInfo.FullName);
+}
+
+private void OnError(object sender, ConversionErrorEventArgs e)
+{
+    Console.WriteLine("[{0} => {1}]: Error: {2}\n{3}", e.Input.FileInfo.Name, e.Output.FileInfo.Name, e.Exception.ExitCode, e.Exception.InnerException);
 }
 ```
 
