@@ -1,7 +1,7 @@
 [<img src="lib/ffmpeg/v4/icon.png" alt="drawing" width="24" height="24" /> FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET)
 ============
 
-[![NuGet](https://img.shields.io/nuget/v/xFFmpeg.NET.svg?style=flat-square)](https://www.nuget.org/packages/xFFmpeg.NET)
+[![NuGet](https://img.shields.io/nuget/v/xFFmpeg.NET.svg?style=flat)](https://www.nuget.org/packages/xFFmpeg.NET)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/lelhr75harlrqt75/branch/master?svg=true)](https://ci.appveyor.com/project/cmxl/ffmpeg-net/branch/master)
 
