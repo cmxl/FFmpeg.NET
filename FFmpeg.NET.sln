@@ -2,11 +2,32 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFmpeg.NET", "FFmpeg.NET\FFmpeg.NET.csproj", "{C7CEB960-0B11-4E6F-9C5C-633232C512E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFmpeg.NET", "src\FFmpeg.NET\FFmpeg.NET.csproj", "{C7CEB960-0B11-4E6F-9C5C-633232C512E2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFmpeg.NET.Tests", "FFmpeg.NET.Tests\FFmpeg.NET.Tests.csproj", "{80EF7FD5-F803-4302-B870-CC8B086587FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFmpeg.NET.Tests", "tests\FFmpeg.NET.Tests\FFmpeg.NET.Tests.csproj", "{80EF7FD5-F803-4302-B870-CC8B086587FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFmpeg.NET.GZipper", "FFmpeg.NET.GZipper\FFmpeg.NET.GZipper.csproj", "{DFABE20F-F930-450F-BF61-7F1C49A2FE35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFmpeg.NET.GZipper", "src\FFmpeg.NET.GZipper\FFmpeg.NET.GZipper.csproj", "{DFABE20F-F930-450F-BF61-7F1C49A2FE35}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B2872169-E4DF-410E-9F98-C35E1C2C118F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{31CA4F16-6E17-4D54-8149-F11EB7794A6D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{5CBF35BC-014C-4608-8E6C-A3EB7A087B82}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ffmpeg", "ffmpeg", "{B502D2D6-8F63-4359-9531-2E48E635DBD0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "v4", "v4", "{8831CF40-BEB6-4760-982D-9B9C8CEDE717}"
+	ProjectSection(SolutionItems) = preProject
+		lib\ffmpeg\v4\ffmpeg.exe = lib\ffmpeg\v4\ffmpeg.exe
+		lib\ffmpeg\v4\icon.png = lib\ffmpeg\v4\icon.png
+		lib\ffmpeg\v4\icon.svg = lib\ffmpeg\v4\icon.svg
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E2015192-308C-4A28-A3AD-2BE197BFAFE4}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +78,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C7CEB960-0B11-4E6F-9C5C-633232C512E2} = {B2872169-E4DF-410E-9F98-C35E1C2C118F}
+		{80EF7FD5-F803-4302-B870-CC8B086587FA} = {31CA4F16-6E17-4D54-8149-F11EB7794A6D}
+		{DFABE20F-F930-450F-BF61-7F1C49A2FE35} = {B2872169-E4DF-410E-9F98-C35E1C2C118F}
+		{B502D2D6-8F63-4359-9531-2E48E635DBD0} = {5CBF35BC-014C-4608-8E6C-A3EB7A087B82}
+		{8831CF40-BEB6-4760-982D-9B9C8CEDE717} = {B502D2D6-8F63-4359-9531-2E48E635DBD0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD084B74-E89E-4E1D-84D2-38383B7616EE}

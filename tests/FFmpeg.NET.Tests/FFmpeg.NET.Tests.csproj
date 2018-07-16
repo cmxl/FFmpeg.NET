@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FFmpeg.NET\FFmpeg.NET.csproj" />
+    <ProjectReference Include="..\..\FFmpeg.NET\FFmpeg.NET.csproj" />
   </ItemGroup>
 
 </Project>
