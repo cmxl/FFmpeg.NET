@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using FFmpeg.NET.Events;
 using FFmpeg.NET.Exceptions;
+using FFmpeg.NET.Extensions;
 
 namespace FFmpeg.NET.Engine
 {
@@ -11,13 +14,24 @@ namespace FFmpeg.NET.Engine
     {
         public void Execute(FFmpegParameters parameters, string ffmpegFilePath)
         {
+            ExecuteAsync(parameters, ffmpegFilePath).Wait();
+        }
+
+        public async Task ExecuteAsync(FFmpegParameters parameters, string ffmpegFilePath, CancellationToken cancellationToken = default(CancellationToken))
+        {
             var argumentBuilder = new FFmpegArgumentBuilder();
             var arguments = argumentBuilder.Build(parameters);
             var startInfo = GenerateStartInfo(ffmpegFilePath, arguments);
-            Execute(startInfo, parameters);
+            await ExecuteAsync(startInfo, parameters, cancellationToken);
         }
 
+
         private void Execute(ProcessStartInfo startInfo, FFmpegParameters parameters)
+        {
+            ExecuteAsync(startInfo, parameters).Wait();
+        }
+
+        private async Task ExecuteAsync(ProcessStartInfo startInfo, FFmpegParameters parameters, CancellationToken cancellationToken = default(CancellationToken))
         {
             var messages = new List<string>();
             Exception caughtException = null;
@@ -31,7 +45,7 @@ namespace FFmpeg.NET.Engine
                 ffmpegProcess.ErrorDataReceived += (sender, e) => { FFmpegProcessOnErrorDataReceived(e, parameters, ref caughtException, messages); };
 
                 ffmpegProcess.BeginErrorReadLine();
-                ffmpegProcess.WaitForExit();
+                await ffmpegProcess.WaitForExitAsync(cancellationToken);
 
                 if (ffmpegProcess.ExitCode != 0 || caughtException != null)
                 {
@@ -75,7 +89,7 @@ namespace FFmpeg.NET.Engine
                     if (matchDuration.Success)
                     {
                         if (parameters.InputFile.MetaData == null)
-                            parameters.InputFile.MetaData = new MetaData {FileInfo = parameters.InputFile.FileInfo};
+                            parameters.InputFile.MetaData = new MetaData { FileInfo = parameters.InputFile.FileInfo };
 
                         TimeSpan.TryParse(matchDuration.Groups[1].Value, out totalMediaDuration);
                         parameters.InputFile.MetaData.Duration = totalMediaDuration;
