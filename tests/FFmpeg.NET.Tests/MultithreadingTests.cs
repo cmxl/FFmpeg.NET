@@ -55,6 +55,15 @@ namespace FFmpeg.NET.Tests
             var task2 = Task.Run(() => { new Engine.FFmpeg().GetMetaData(_fixture.VideoFile); });
             var task3 = Task.Run(() => { new Engine.FFmpeg().GetMetaData(_fixture.VideoFile); });
             Task.WaitAll(task1, task2, task3);
+
+            Task.Run(() => { new Engine.FFmpeg().GetMetaData(_fixture.VideoFile); }).Wait();
+
+            task1 = new Engine.FFmpeg().GetMetaDataAsync(_fixture.VideoFile);
+            task2 = new Engine.FFmpeg().GetMetaDataAsync(_fixture.VideoFile);
+            task3 = new Engine.FFmpeg().GetMetaDataAsync(_fixture.VideoFile);
+            Task.WaitAll(task1, task2, task3);
+
+            new Engine.FFmpeg().GetMetaData(_fixture.VideoFile);
         }
     }
 }
