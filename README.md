@@ -1,10 +1,6 @@
 [<img src="lib/ffmpeg/v4/icon.png" alt="drawing" width="24" height="24" /> FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET)
 ============
 
-[![NuGet](https://img.shields.io/nuget/v/xFFmpeg.NET.svg?style=flat)](https://www.nuget.org/packages/xFFmpeg.NET)
-
-[![Build status](https://ci.appveyor.com/api/projects/status/lelhr75harlrqt75/branch/master?svg=true)](https://ci.appveyor.com/project/cmxl/ffmpeg-net/branch/master)
-
 [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) provides a straightforward interface for handling media data, making tasks such as converting, slicing and editing both audio and video completely effortless.
 
 Under the hood, [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) is a .NET wrapper for FFmpeg; a free (LGPLv2.1) multimedia framework containing multiple audio and video codecs, supporting muxing, demuxing and transcoding tasks on many media formats.
@@ -14,16 +10,30 @@ Many features have been refactored. The library has been ported to Netstandard a
 
 Uses [ffmpeg v4 (win-x64)](https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20180526-63c4a4b-win64-static.zip) internally.
 
-Contents
----------
+
+## Project Health
+
+| Service | Status |
+| --- | --- |
+| AppVeyor | [![Build status](https://ci.appveyor.com/api/projects/status/lelhr75harlrqt75/branch/master?svg=true)](https://ci.appveyor.com/project/cmxl/ffmpeg-net/branch/master) |
+
+
+## Packages
+
+| Package | NuGet |
+| --- | --- |
+| xFFmpeg.NET | [![NuGet](https://buildstats.info/nuget/xFFmpeg.NET)](https://www.nuget.org/packages/xFFmpeg.NET) |
+
+
+## Contents
 
 1. [Features](#features)
 2. [Get started!](#get-started)
 3. [Samples](#samples)
 4. [Licensing](#licensing)
 
-Features
--------------
+## Features
+
 - Resolving metadata
 - Generating thumbnails from videos
 - Transcode audio & video into other formats using parameters such as:
@@ -41,14 +51,13 @@ Features
 - Supports custom FFmpeg command line arguments
 - Raising progress events
 
-Get started!
-------------
+## Get started!
+
 Install [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) from nuget.org Package Source using the Package Manager Console with the following command
 
     PM> Install-Package xFFmpeg.NET
 
-Samples
--------
+## Samples
 
 - [Grab thumbnail from a video](#grab-thumbnail-from-a-video)
 - [Retrieve metadata](#retrieve-metadata)  
