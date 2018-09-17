@@ -32,6 +32,6 @@ build_script:
   - cmd: dotnet build FFmpeg.NET.sln -c Release /p:DebugType=Full
   - cmd: dotnet test tests\FFmpeg.NET.Tests\FFmpeg.NET.Tests.csproj -c Release --no-build
   - cmd: dotnet pack -c Release --no-build --include-symbols -o artifacts /p:PackageVersion=%APPVEYOR_BUILD_VERSION%
-  - cmd: dotnet nuget push artifacts\FFmpeg.NET.%APPVEYOR_BUILD_VERSION%.nupkg -k %nuget_token% -s https://www.nuget.org/api/v2/package
+  - cmd: dotnet nuget push src\FFmpeg.NET\artifacts\FFmpeg.NET.%APPVEYOR_BUILD_VERSION%.nupkg -k %nuget_token% -s https://www.nuget.org/api/v2/package
 
 test: off
