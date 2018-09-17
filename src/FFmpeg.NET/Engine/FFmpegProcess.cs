@@ -62,7 +62,8 @@ namespace FFmpeg.NET.Engine
                     {
                     }
 
-                    var exception = new FFmpegException(messages[1] + messages[0], caughtException, ffmpegProcess.ExitCode);
+                    var exceptionMessage = GetExceptionMessage(messages);
+                    var exception = new FFmpegException(exceptionMessage, caughtException, ffmpegProcess.ExitCode);
                     OnConversionError(new ConversionErrorEventArgs(exception, parameters.InputFile, parameters.OutputFile));
                 }
                 else
@@ -70,6 +71,13 @@ namespace FFmpeg.NET.Engine
                     OnConversionCompleted(new ConversionCompleteEventArgs(parameters.InputFile, parameters.OutputFile));
                 }
             }
+        }
+
+        private string GetExceptionMessage(List<string> messages)
+        {
+            if (messages.Count > 1)
+                return messages[1] + messages[0];
+            return string.Join("", messages);
         }
 
         private void FFmpegProcessOnErrorDataReceived(DataReceivedEventArgs e, FFmpegParameters parameters, ref Exception exception, List<string> messages)
