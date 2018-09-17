@@ -1,0 +1,37 @@
+version: 1.1.{build}
+
+environment:
+  nuget_token:
+      secure: 3Eg+MTP6X6DXGbAEsZh7O/rbwemKH/Wvg7ekZ/liLlRTB2nD01fdpgehUUWHX9Vg
+
+branches:
+  only:
+  - master
+
+skip_branch_with_pr: true
+skip_tags: true
+
+max_jobs: 1
+image: Visual Studio 2017
+configuration: Release
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: "{version}"
+  package_version: "{version}"
+  assembly_version: "{version}"
+  file_version: "{version}"
+  informational_version: "{version}"
+
+matrix:
+  fast_finish: true
+
+build_script:
+  - cmd: dotnet restore
+  - cmd: dotnet build FFmpeg.NET.sln -c Release /p:DebugType=Full
+  - cmd: dotnet test tests\FFmpeg.NET.Tests\FFmpeg.NET.Tests.csproj -c Release --no-build
+  - cmd: dotnet pack -c Release --no-build --include-symbols -o ..\..\artifacts /p:PackageVersion=%APPVEYOR_BUILD_VERSION%
+  - cmd: dotnet nuget push artifacts\FFmpeg.NET.%APPVEYOR_BUILD_VERSION%.nupkg -k %nuget_token% -s https://www.nuget.org/api/v2/package
+
+test: off
