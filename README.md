@@ -48,7 +48,7 @@ Uses [ffmpeg v4 (win-x64)](https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg
 - Convert media to physical formats and standards such as:
     - Standards include: `FILM`, `PAL` & `NTSC`
     - Mediums include: `DVD`, `DV`, `DV50`, `VCD` & `SVCD`
-- Supports custom FFmpeg command line arguments
+- ~~Supports custom FFmpeg command line arguments~~ (not yet)
 - Raising progress events
 
 ## Get started!
