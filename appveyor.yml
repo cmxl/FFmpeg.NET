@@ -30,7 +30,7 @@ matrix:
 build_script:
   - cmd: dotnet restore
   - cmd: dotnet build FFmpeg.NET.sln -c Release /p:DebugType=Full
-  - cmd: dotnet test tests\FFmpeg.NET.Tests\FFmpeg.NET.Tests.csproj -c Release --no-build --logger:console;verbosity=detailed
+  - cmd: dotnet test tests\FFmpeg.NET.Tests\FFmpeg.NET.Tests.csproj
   - cmd: dotnet pack -c Release --no-build --include-symbols -o artifacts /p:PackageVersion=%APPVEYOR_BUILD_VERSION%
   - cmd: dotnet nuget push src\FFmpeg.NET\artifacts\xFFmpeg.NET.%APPVEYOR_BUILD_VERSION%.nupkg -k %nuget_token% -s https://www.nuget.org/api/v2/package
 
