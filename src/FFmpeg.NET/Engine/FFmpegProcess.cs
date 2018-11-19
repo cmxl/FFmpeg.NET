@@ -1,22 +1,16 @@
-﻿using System;
+﻿using FFmpeg.NET.Events;
+using FFmpeg.NET.Exceptions;
+using FFmpeg.NET.Extensions;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using FFmpeg.NET.Events;
-using FFmpeg.NET.Exceptions;
-using FFmpeg.NET.Extensions;
 
 namespace FFmpeg.NET.Engine
 {
     internal sealed class FFmpegProcess
     {
-        public void Execute(FFmpegParameters parameters, string ffmpegFilePath)
-        {
-            ExecuteAsync(parameters, ffmpegFilePath).Wait();
-        }
-
         public async Task ExecuteAsync(FFmpegParameters parameters, string ffmpegFilePath, CancellationToken cancellationToken = default(CancellationToken))
         {
             var argumentBuilder = new FFmpegArgumentBuilder();
@@ -25,52 +19,34 @@ namespace FFmpeg.NET.Engine
             await ExecuteAsync(startInfo, parameters, cancellationToken);
         }
 
-
-        private void Execute(ProcessStartInfo startInfo, FFmpegParameters parameters)
-        {
-            ExecuteAsync(startInfo, parameters).Wait();
-        }
-
-        private async Task ExecuteAsync(ProcessStartInfo startInfo, FFmpegParameters parameters, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task ExecuteAsync(ProcessStartInfo startInfo, FFmpegParameters parameters, CancellationToken cancellationToken = default)
         {
             var messages = new List<string>();
             Exception caughtException = null;
-
-            using (var ffmpegProcess = Process.Start(startInfo))
+                       
+            using (var ffmpegProcess = new Process() { StartInfo = startInfo })
             {
-                if (ffmpegProcess == null)
-                    throw new InvalidOperationException(Resources.Resources.Exceptions_FFmpeg_Process_Not_Running);
-
                 ffmpegProcess.ErrorDataReceived += (sender, e) => OnData(new ConversionDataEventArgs(e.Data, parameters.InputFile, parameters.OutputFile));
-                ffmpegProcess.ErrorDataReceived += (sender, e) => { FFmpegProcessOnErrorDataReceived(e, parameters, ref caughtException, messages); };
+                ffmpegProcess.ErrorDataReceived += (sender, e) => FFmpegProcessOnErrorDataReceived(e, parameters, ref caughtException, messages);
 
-                ffmpegProcess.BeginErrorReadLine();
-                await ffmpegProcess.WaitForExitAsync(cancellationToken);
+                await ffmpegProcess.WaitForExitAsync((exitCode) => OnException(messages, parameters, exitCode, caughtException), cancellationToken);
 
-                if (ffmpegProcess.ExitCode != 0 || caughtException != null)
+                if (caughtException != null || ffmpegProcess.ExitCode != 0)
                 {
-                    try
-                    {
-                        ffmpegProcess.Kill();
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        // swallow exceptions that are thrown when killing the process, 
-                        // one possible candidate is the application ending naturally before we get a chance to kill it
-                    }
-                    catch (Win32Exception)
-                    {
-                    }
-
-                    var exceptionMessage = GetExceptionMessage(messages);
-                    var exception = new FFmpegException(exceptionMessage, caughtException, ffmpegProcess.ExitCode);
-                    OnConversionError(new ConversionErrorEventArgs(exception, parameters.InputFile, parameters.OutputFile));
+                    OnException(messages, parameters, ffmpegProcess.ExitCode, caughtException);
                 }
                 else
                 {
                     OnConversionCompleted(new ConversionCompleteEventArgs(parameters.InputFile, parameters.OutputFile));
-                }
+                }   
             }
+        }
+
+        private void OnException(List<string> messages, FFmpegParameters parameters, int exitCode, Exception caughtException)
+        {
+            var exceptionMessage = GetExceptionMessage(messages);
+            var exception = new FFmpegException(exceptionMessage, caughtException, exitCode);
+            OnConversionError(new ConversionErrorEventArgs(exception, parameters.InputFile, parameters.OutputFile));
         }
 
         private string GetExceptionMessage(List<string> messages)
@@ -83,7 +59,8 @@ namespace FFmpeg.NET.Engine
         private void FFmpegProcessOnErrorDataReceived(DataReceivedEventArgs e, FFmpegParameters parameters, ref Exception exception, List<string> messages)
         {
             var totalMediaDuration = new TimeSpan();
-            if (e.Data == null) return;
+            if (e.Data == null)
+                return;
 
             try
             {
@@ -116,44 +93,29 @@ namespace FFmpeg.NET.Engine
             }
         }
 
-        private ProcessStartInfo GenerateStartInfo(string ffmpegPath, string arguments)
+        private ProcessStartInfo GenerateStartInfo(string ffmpegPath, string arguments) => new ProcessStartInfo
         {
-            return new ProcessStartInfo
-            {
-                Arguments = "-nostdin -y -loglevel info " + arguments,
-                FileName = ffmpegPath,
-                CreateNoWindow = true,
-                RedirectStandardInput = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                WindowStyle = ProcessWindowStyle.Hidden
-            };
-        }
+            Arguments = "-nostdin -y -loglevel info " + arguments,
+            FileName = ffmpegPath,
+            CreateNoWindow = true,
+            RedirectStandardInput = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            WindowStyle = ProcessWindowStyle.Hidden
+        };
 
         public event Action<ConversionProgressEventArgs> Progress;
         public event Action<ConversionCompleteEventArgs> Completed;
         public event Action<ConversionErrorEventArgs> Error;
         public event Action<ConversionDataEventArgs> Data;
 
-        private void OnProgressChanged(ConversionProgressEventArgs eventArgs)
-        {
-            Progress?.Invoke(eventArgs);
-        }
+        private void OnProgressChanged(ConversionProgressEventArgs eventArgs) => Progress?.Invoke(eventArgs);
 
-        private void OnConversionCompleted(ConversionCompleteEventArgs eventArgs)
-        {
-            Completed?.Invoke(eventArgs);
-        }
+        private void OnConversionCompleted(ConversionCompleteEventArgs eventArgs) => Completed?.Invoke(eventArgs);
 
-        private void OnConversionError(ConversionErrorEventArgs eventArgs)
-        {
-            Error?.Invoke(eventArgs);
-        }
+        private void OnConversionError(ConversionErrorEventArgs eventArgs) => Error?.Invoke(eventArgs);
 
-        private void OnData(ConversionDataEventArgs eventArgs)
-        {
-            Data?.Invoke(eventArgs);
-        }
+        private void OnData(ConversionDataEventArgs eventArgs) => Data?.Invoke(eventArgs);
     }
 }

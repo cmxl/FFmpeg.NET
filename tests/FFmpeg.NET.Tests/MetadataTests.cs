@@ -1,4 +1,5 @@
 using FFmpeg.NET.Tests.Fixtures;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace FFmpeg.NET.Tests
@@ -13,12 +14,12 @@ namespace FFmpeg.NET.Tests
         private readonly MediaFileFixture _fixture;
 
         [Fact]
-        public void FFmpeg_Can_Read_Audio_Metadata()
+        public async Task FFmpeg_Can_Read_Audio_Metadata()
         {
-            var ffmpeg = new Engine.FFmpeg();
+            var ffmpeg = new Engine.FFmpeg("ffmpeg");
 
             var audioFile = _fixture.AudioFile;
-            var metaData = ffmpeg.GetMetaData(audioFile);
+            var metaData = await ffmpeg.GetMetaDataAsync(audioFile);
 
             Assert.NotNull(metaData);
 
@@ -34,12 +35,12 @@ namespace FFmpeg.NET.Tests
         }
 
         [Fact]
-        public void FFmpeg_Can_Read_Video_Metadata()
+        public async Task FFmpeg_Can_Read_Video_Metadata()
         {
-            var ffmpeg = new Engine.FFmpeg();
+            var ffmpeg = new Engine.FFmpeg("ffmpeg");
 
             var videoFile = _fixture.VideoFile;
-            var metaData = ffmpeg.GetMetaData(videoFile);
+            var metaData = await ffmpeg.GetMetaDataAsync(videoFile);
 
             Assert.NotNull(metaData);
             Assert.Equal(metaData.FileInfo, videoFile.FileInfo);

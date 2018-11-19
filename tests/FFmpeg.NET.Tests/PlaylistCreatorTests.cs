@@ -1,32 +1,40 @@
-﻿using System;
+﻿using FFmpeg.NET.Services;
+using FFmpeg.NET.Tests.Fixtures;
+using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using FFmpeg.NET.Services;
-using FFmpeg.NET.Tests.Fixtures;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FFmpeg.NET.Tests
 {
     public class PlaylistCreatorTests : IClassFixture<MediaFileFixture>
     {
-        public PlaylistCreatorTests(MediaFileFixture fixture)
+        public PlaylistCreatorTests(MediaFileFixture fixture, ITestOutputHelper output)
         {
             _fixture = fixture;
+            _output = output;
         }
 
         private readonly MediaFileFixture _fixture;
+        private readonly ITestOutputHelper _output;
 
         [Fact]
-        public void M3uPlaylistCreator_Creates_Valid_m3u8_Content()
+        public async Task M3uPlaylistCreator_Creates_Valid_m3u8_Content()
         {
-            var ffmpeg = new Engine.FFmpeg();
-            var meta1 = ffmpeg.GetMetaData(_fixture.VideoFile);
-            var meta2 = ffmpeg.GetMetaData(_fixture.AudioFile);
+            var ffmpeg = new Engine.FFmpeg("ffmpeg");
+            var meta1 = await ffmpeg.GetMetaDataAsync(_fixture.VideoFile);
+            var meta2 = await ffmpeg.GetMetaDataAsync(_fixture.AudioFile);
+            
+            _output.WriteLine(meta1?.ToString() ?? "-- KEIN META ! --");
+            _output.WriteLine(meta2?.ToString());
 
             Assert.NotNull(meta1);
             Assert.NotNull(meta2);
 
-            var m3u8 = new M3uPlaylistCreator().Create(new[] {meta1, meta2});
+            var m3u8 = new M3uPlaylistCreator().Create(new[] { meta1, meta2 });
 
             Assert.NotNull(m3u8);
 
@@ -42,16 +50,16 @@ namespace FFmpeg.NET.Tests
         }
 
         [Fact]
-        public void XspfPlaylistCreator_Creates_Valid_Xml()
+        public async Task XspfPlaylistCreator_Creates_Valid_Xml()
         {
-            var ffmpeg = new Engine.FFmpeg();
-            var meta1 = ffmpeg.GetMetaData(_fixture.VideoFile);
-            var meta2 = ffmpeg.GetMetaData(_fixture.AudioFile);
+            var ffmpeg = new Engine.FFmpeg("ffmpeg");
+            var meta1 = await ffmpeg.GetMetaDataAsync(_fixture.VideoFile);
+            var meta2 = await ffmpeg.GetMetaDataAsync(_fixture.AudioFile);
 
             Assert.NotNull(meta1);
             Assert.NotNull(meta2);
 
-            var xml = new XspfPlaylistCreator().Create(new[] {meta1, meta2});
+            var xml = new XspfPlaylistCreator().Create(new[] { meta1, meta2 });
 
             Assert.NotNull(xml);
             Assert.NotEmpty(xml);
@@ -72,6 +80,6 @@ namespace FFmpeg.NET.Tests
                 Assert.Contains($"file:///{file1.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)}", xspf);
                 Assert.Contains($"file:///{file2.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)}", xspf);
             }
-        }
+        }    
     }
 }

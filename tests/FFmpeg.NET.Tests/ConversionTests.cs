@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using FFmpeg.NET.Events;
 using FFmpeg.NET.Tests.Fixtures;
 using Xunit;
@@ -19,39 +20,38 @@ namespace FFmpeg.NET.Tests
         private readonly ITestOutputHelper _outputHelper;
 
         [Fact]
-        public void FFmpeg_Invokes_ConversionCompleteEvent()
+        public async Task FFmpeg_Invokes_ConversionCompleteEvent()
         {
             var output = new MediaFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.mp4")));
+            var ffmpeg = new Engine.FFmpeg("ffmpeg");
 
-            ConversionCompleteEventArgs completeEventArgs = null;
-
-            var ffmpeg = new Engine.FFmpeg();
-            ffmpeg.Complete += (sender, args) => { 
-                completeEventArgs = args;
-                _outputHelper.WriteLine("ConversionCompletedEvent: {0}", args);
-            };
-            ffmpeg.Convert(_fixture.VideoFile, output);
+            var e = await Assert.RaisesAsync<ConversionCompleteEventArgs>(
+                x => ffmpeg.Complete += x,
+                x => ffmpeg.Complete -= x,
+                async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output)
+            );
             
             Assert.True(File.Exists(output.FileInfo.FullName));
             output.FileInfo.Delete();
             Assert.False(File.Exists(output.FileInfo.FullName));
 
-            Assert.NotNull(completeEventArgs);
-            Assert.NotNull(completeEventArgs.Output);
-            Assert.Equal(output, completeEventArgs.Output);
+            Assert.NotNull(e);
+            Assert.Equal(e.Sender, ffmpeg);
+            Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.FileInfo.FullName);
+            Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.FileInfo.FullName);
         }
 
         [Fact]
-        public void FFmpeg_Should_Throw_Exception_On_Invalid_OutputFile()
+        public async Task FFmpeg_Should_Throw_Exception_On_Invalid_OutputFile()
         {
-            var ffmpeg = new Engine.FFmpeg();
+            var ffmpeg = new Engine.FFmpeg("ffmpeg");
             var output = new MediaFile("test.txt");
             var input = _fixture.VideoFile;
 
-            var e = Assert.Raises<ConversionErrorEventArgs>(
+            var e = await Assert.RaisesAsync<ConversionErrorEventArgs>(
                 x => ffmpeg.Error += x,
                 x => ffmpeg.Error -= x,
-                () => ffmpeg.Convert(input, output));
+                async () => await ffmpeg.ConvertAsync(input, output));
 
             Assert.NotNull(e);
             Assert.Equal(e.Sender, ffmpeg);

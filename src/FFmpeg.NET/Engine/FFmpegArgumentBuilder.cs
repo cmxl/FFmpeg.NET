@@ -1,7 +1,7 @@
-﻿using System;
+﻿using FFmpeg.NET.Enums;
+using System;
 using System.Globalization;
 using System.Text;
-using FFmpeg.NET.Enums;
 
 namespace FFmpeg.NET.Engine
 {
@@ -24,10 +24,7 @@ namespace FFmpeg.NET.Engine
             }
         }
 
-        private static string GetMetadata(MediaFile inputFile)
-        {
-            return $"-i \"{inputFile.FileInfo.FullName}\" ";
-        }
+        private static string GetMetadata(MediaFile inputFile) => $"-i \"{inputFile.FileInfo.FullName}\" -f ffmetadata -";
 
         private static string GetThumbnail(MediaFile inputFile, MediaFile outputFile, ConversionOptions conversionOptions)
         {
@@ -99,8 +96,10 @@ namespace FFmpeg.NET.Engine
             else if (conversionOptions.VideoSize != VideoSize.Default)
             {
                 var size = conversionOptions.VideoSize.ToString().ToLowerInvariant();
-                if (size.StartsWith("_")) size = size.Replace("_", "");
-                if (size.Contains("_")) size = size.Replace("_", "-");
+                if (size.StartsWith("_"))
+                    size = size.Replace("_", "");
+                if (size.Contains("_"))
+                    size = size.Replace("_", "-");
 
                 commandBuilder.AppendFormat(" -s {0} ", size);
             }
@@ -122,7 +121,8 @@ namespace FFmpeg.NET.Engine
                 commandBuilder.AppendFormat(" -filter:v \"crop={0}:{1}:{2}:{3}\" ", crop.Width, crop.Height, crop.X, crop.Y);
             }
 
-            if (conversionOptions.BaselineProfile) commandBuilder.Append(" -profile:v baseline ");
+            if (conversionOptions.BaselineProfile)
+                commandBuilder.Append(" -profile:v baseline ");
 
             return commandBuilder.AppendFormat(" \"{0}\" ", outputFile.FileInfo.FullName).ToString();
         }
