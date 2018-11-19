@@ -8,8 +8,7 @@ Under the hood, [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) is a .NET wrapp
 Some major parts are taken from https://github.com/AydinAdn/MediaToolkit.
 Many features have been refactored. The library has been ported to Netstandard and made threadsafe.
 
-Uses [ffmpeg v4 (win-x64)](https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20180526-63c4a4b-win64-static.zip) internally.
-
+You need to provide a path to the ffmpeg executable to the `Engine.FFmpeg` instance or set it as the environment variable `FFMPEG`.
 
 ## Project Health
 
@@ -17,13 +16,11 @@ Uses [ffmpeg v4 (win-x64)](https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg
 | --- | --- |
 | AppVeyor | [![Build status](https://ci.appveyor.com/api/projects/status/lelhr75harlrqt75/branch/master?svg=true)](https://ci.appveyor.com/project/cmxl/ffmpeg-net/branch/master) |
 
-
 ## Packages
 
 | Package | NuGet |
 | --- | --- |
 | xFFmpeg.NET | [![NuGet](https://buildstats.info/nuget/xFFmpeg.NET)](https://www.nuget.org/packages/xFFmpeg.NET) |
-
 
 ## Contents
 
@@ -73,10 +70,10 @@ Install [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) from nuget.org Package 
 var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
 var outputFile = new MediaFile (@"C:\Path\To_Save_Image.jpg");
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
+var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
 // Saves the frame located on the 15th second of the video.
 var options = new ConversionOptions { Seek = TimeSpan.FromSeconds(15) };
-ffmpeg.GetThumbnail(inputFile, outputFile, options);
+await ffmpeg.GetThumbnailAsync(inputFile, outputFile, options);
 ```
 
 ### Retrieve metadata
@@ -85,7 +82,7 @@ ffmpeg.GetThumbnail(inputFile, outputFile, options);
 var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
 
 var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
-var metadata = ffmpeg.GetMetadata(inputFile);
+var metadata = await ffmpeg.GetMetadataAsync(inputFile);
 
 Console.WriteLine(metadata.Duration);
 ```
@@ -97,7 +94,7 @@ var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
 var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");
 
 var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
-ffmpeg.Convert(inputFile, outputFile);
+await ffmpeg.ConvertAsync(inputFile, outputFile);
 ```
 
 ### Convert Flash video to DVD
@@ -108,12 +105,12 @@ var outputFile = new MediaFile (@"C:\Path\To_Save_New_DVD.vob");
 
 var conversionOptions = new ConversionOptions
 {
-    Target = Target.DVD, 
+    Target = Target.DVD,
     TargetStandard = TargetStandard.PAL
 };
 
 var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
-ffmpeg.Convert(inputFile, outputFile, conversionOptions);
+await ffmpeg.ConvertAsync(inputFile, outputFile, conversionOptions);
 ```
 
 ### Transcoding options FLV to MP4
@@ -131,7 +128,7 @@ var conversionOptions = new ConversionOptions
 };
 
 var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
-ffmpeg.Convert(inputFile, outputFile, conversionOptions);
+await ffmpeg.ConvertAsync(inputFile, outputFile, conversionOptions);
 ```
 
 ### Cut video down to smaller length
@@ -148,23 +145,23 @@ var options = new ConversionOptions();
 //// First parameter requests the starting frame to cut the media from.
 //// Second parameter requests how long to cut the video.
 options.CutMedia(TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(25));
-ffmpeg.Convert(inputFile, outputFile, options);
+await ffmpeg.ConvertAsync(inputFile, outputFile, options);
 ```
 
 ### Subscribe to events
 
 ```csharp
-public void StartConverting()
+public async Task StartConverting()
 {
     var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
-    var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");    
+    var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");
 
     var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
     ffmpeg.Progress += OnProgress;
     ffmpeg.Data += OnData;
     ffmpeg.Error += OnError;
     ffmpeg.Complete += OnComplete;
-    ffmpeg.Convert(inputFile, outputFile);
+    await ffmpeg.ConvertAsync(inputFile, outputFile);
 }
 
 private void OnProgress(object sender, ConversionProgressEventArgs e)
@@ -194,8 +191,7 @@ private void OnError(object sender, ConversionErrorEventArgs e)
 }
 ```
 
-
-Licensing
+### Licensing
 ---------  
 - Forwards licensing of [MediaToolkit](https://github.com/AydinAdn/MediaToolkit/blob/master/LICENSE.md)
 - [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) is licensed under the [MIT license](https://github.com/cmxl/FFmpeg.NET/blob/master/LICENSE.md)
