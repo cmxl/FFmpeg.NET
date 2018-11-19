@@ -1,4 +1,4 @@
-version: 1.1.{build}
+version: 2.0.0
 
 environment:
   FFMPEG: C:\projects\ffmpeg-net\lib\ffmpeg\v4\ffmpeg.exe
