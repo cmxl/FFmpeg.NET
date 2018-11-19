@@ -1,6 +1,7 @@
 version: 1.1.{build}
 
 environment:
+  FFMPEG: C:\projects\ffmpeg-net\lib\ffmpeg\v4\ffmpeg.exe
   nuget_token:
       secure: 3Eg+MTP6X6DXGbAEsZh7O/rbwemKH/Wvg7ekZ/liLlRTB2nD01fdpgehUUWHX9Vg
 
@@ -30,7 +31,7 @@ matrix:
 build_script:
   - cmd: dotnet restore
   - cmd: dotnet build FFmpeg.NET.sln -c Release /p:DebugType=Full
-  - cmd: SET FFMPEG=lib\ffmpeg\v4\ffmpeg.exe
+  - cmd: echo %FFMPEG% 
   - cmd: dotnet test tests\FFmpeg.NET.Tests\FFmpeg.NET.Tests.csproj -c Release --no-build
   - cmd: dotnet pack -c Release --no-build --include-symbols -o artifacts /p:PackageVersion=%APPVEYOR_BUILD_VERSION%
   - cmd: dotnet nuget push src\FFmpeg.NET\artifacts\xFFmpeg.NET.%APPVEYOR_BUILD_VERSION%.nupkg -k %nuget_token% -s https://www.nuget.org/api/v2/package
