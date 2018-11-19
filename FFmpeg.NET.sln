@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "v4", "v4", "{8831CF40-BEB6-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E2015192-308C-4A28-A3AD-2BE197BFAFE4}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 	EndProjectSection

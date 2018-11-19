@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "FFmpeg.NET.Tests": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "FFMPEG": "..\\..\\..\\..\\..\\lib\\ffmpeg\\v4\\ffmpeg.exe"
+      }
+    }
+  }
+}
