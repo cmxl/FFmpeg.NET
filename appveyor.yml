@@ -3,6 +3,7 @@ version: 1.1.{build}
 environment:
   nuget_token:
       secure: 3Eg+MTP6X6DXGbAEsZh7O/rbwemKH/Wvg7ekZ/liLlRTB2nD01fdpgehUUWHX9Vg
+  FFMPEG: 'lib\ffmpeg\v4\ffmpeg.exe'
 
 branches:
   only:

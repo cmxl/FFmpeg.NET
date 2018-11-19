@@ -11,7 +11,7 @@ namespace FFmpeg.NET.Engine
 {
     internal sealed class FFmpegProcess
     {
-        public async Task ExecuteAsync(FFmpegParameters parameters, string ffmpegFilePath, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task ExecuteAsync(FFmpegParameters parameters, string ffmpegFilePath, CancellationToken cancellationToken = default)
         {
             var argumentBuilder = new FFmpegArgumentBuilder();
             var arguments = argumentBuilder.Build(parameters);
@@ -23,7 +23,7 @@ namespace FFmpeg.NET.Engine
         {
             var messages = new List<string>();
             Exception caughtException = null;
-                       
+
             using (var ffmpegProcess = new Process() { StartInfo = startInfo })
             {
                 ffmpegProcess.ErrorDataReceived += (sender, e) => OnData(new ConversionDataEventArgs(e.Data, parameters.InputFile, parameters.OutputFile));
@@ -38,7 +38,7 @@ namespace FFmpeg.NET.Engine
                 else
                 {
                     OnConversionCompleted(new ConversionCompleteEventArgs(parameters.InputFile, parameters.OutputFile));
-                }   
+                }
             }
         }
 
@@ -49,12 +49,10 @@ namespace FFmpeg.NET.Engine
             OnConversionError(new ConversionErrorEventArgs(exception, parameters.InputFile, parameters.OutputFile));
         }
 
-        private string GetExceptionMessage(List<string> messages)
-        {
-            if (messages.Count > 1)
-                return messages[1] + messages[0];
-            return string.Join("", messages);
-        }
+        private string GetExceptionMessage(List<string> messages) 
+            => messages.Count > 1
+                ? messages[1] + messages[0]
+                : string.Join(string.Empty, messages);
 
         private void FFmpegProcessOnErrorDataReceived(DataReceivedEventArgs e, FFmpegParameters parameters, ref Exception exception, List<string> messages)
         {
