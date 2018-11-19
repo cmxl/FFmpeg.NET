@@ -120,14 +120,8 @@
   <data name="Exceptions_FFmpeg_Process_Not_Running" xml:space="preserve">
     <value>FFmpeg process is not running.</value>
   </data>
-  <data name="Exceptions_Null_FFmpeg_Gzip_Stream" xml:space="preserve">
-    <value>FFmpeg GZip stream is null</value>
-  </data>
   <data name="Exception_Media_Input_File_Not_Found" xml:space="preserve">
     <value>Input file not found</value>
-  </data>
-  <data name="FFmpegManifestResourceName" xml:space="preserve">
-    <value>FFmpeg.NET.Resources.ffmpeg.exe.gz</value>
   </data>
   <data name="FFmpegProcessName" xml:space="preserve">
     <value>FFmpeg</value>

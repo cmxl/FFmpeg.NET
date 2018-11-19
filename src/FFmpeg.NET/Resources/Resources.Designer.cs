@@ -79,24 +79,6 @@ namespace FFmpeg.NET.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FFmpeg GZip stream is null.
-        /// </summary>
-        internal static string Exceptions_Null_FFmpeg_Gzip_Stream {
-            get {
-                return ResourceManager.GetString("Exceptions_Null_FFmpeg_Gzip_Stream", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to FFmpeg.NET.Resources.ffmpeg.exe.gz.
-        /// </summary>
-        internal static string FFmpegManifestResourceName {
-            get {
-                return ResourceManager.GetString("FFmpegManifestResourceName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to FFmpeg.
         /// </summary>
         internal static string FFmpegProcessName {
