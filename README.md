@@ -8,7 +8,7 @@ Under the hood, [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) is a .NET wrapp
 Some major parts are taken from https://github.com/AydinAdn/MediaToolkit.
 Many features have been refactored. The library has been ported to Netstandard and made threadsafe.
 
-You need to provide a path to the ffmpeg executable to the `Engine.FFmpeg` instance or set it as the environment variable `FFMPEG`.
+You need to provide the ffmpeg executable path to the `Engine.FFmpeg` instance.
 
 ## Project Health
 
@@ -45,7 +45,7 @@ You need to provide a path to the ffmpeg executable to the `Engine.FFmpeg` insta
 - Convert media to physical formats and standards such as:
     - Standards include: `FILM`, `PAL` & `NTSC`
     - Mediums include: `DVD`, `DV`, `DV50`, `VCD` & `SVCD`
-- ~~Supports custom FFmpeg command line arguments~~ (not yet)
+- Supports custom FFmpeg command line arguments (*NEW in v2.1.0*)
 - Raising progress events
 
 ## Get started!

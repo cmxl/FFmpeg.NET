@@ -27,7 +27,7 @@ namespace FFmpeg.NET.Tests
             for (var i = 0; i < Environment.ProcessorCount; i++)
                 outputFiles.Add(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\output{i}.mp4")));
 
-            var ffmpeg = new Engine.FFmpeg();
+            var ffmpeg = new Engine.FFmpeg(_fixture.FFmpegPath);
             ffmpeg.Complete += (sender, args) => { _output.WriteLine("Complete: [{0} => {1}]", args.Input.FileInfo.Name, args.Output.FileInfo.Name); };
             ffmpeg.Progress += (sender, args) => { _output.WriteLine("Progress: {0}", args); };
             ffmpeg.Error += (sender, args) => { _output.WriteLine("Error: [{0} => {1}] ExitCode: {2}\n{3}", args.Input.FileInfo.Name, args.Output.FileInfo.Name, args.Exception.ExitCode, args.Exception); };
@@ -50,9 +50,9 @@ namespace FFmpeg.NET.Tests
         [Fact]
         public void Multiple_FFmpeg_Instances_At_Once_Do_Not_Throw_Exception()
         {
-            var task1 = new Engine.FFmpeg().GetMetaDataAsync(_fixture.VideoFile);
-            var task2 = new Engine.FFmpeg().GetMetaDataAsync(_fixture.VideoFile);
-            var task3 = new Engine.FFmpeg().GetMetaDataAsync(_fixture.VideoFile);
+            var task1 = new Engine.FFmpeg(_fixture.FFmpegPath).GetMetaDataAsync(_fixture.VideoFile);
+            var task2 = new Engine.FFmpeg(_fixture.FFmpegPath).GetMetaDataAsync(_fixture.VideoFile);
+            var task3 = new Engine.FFmpeg(_fixture.FFmpegPath).GetMetaDataAsync(_fixture.VideoFile);
             Task.WaitAll(task1, task2, task3);
         }
     }

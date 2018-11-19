@@ -1,7 +1,5 @@
 ﻿using FFmpeg.NET.Events;
 using System;
-using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,23 +7,19 @@ namespace FFmpeg.NET.Engine
 {
     public sealed class FFmpeg
     {
-        private static readonly string _ffmpegEnvironmentVariable = "FFMPEG";
+        private readonly string _ffmpegPath;
 
-        public FFmpeg(string ffmpegPath = null)
+        public FFmpeg(string ffmpegPath)
         {
-            FFmpegExecutable = ffmpegPath ?? Environment.GetEnvironmentVariable(_ffmpegEnvironmentVariable);
-            if (FFmpegExecutable == null)
-                throw new ArgumentNullException(ffmpegPath, "No ffmpeg executable found in environment");
+            _ffmpegPath = ffmpegPath ?? throw new ArgumentNullException(ffmpegPath, "FFmpeg executable path needs to be provided.");
         }
-
-        private string FFmpegExecutable { get; }
 
         public event EventHandler<ConversionProgressEventArgs> Progress;
         public event EventHandler<ConversionErrorEventArgs> Error;
         public event EventHandler<ConversionCompleteEventArgs> Complete;
         public event EventHandler<ConversionDataEventArgs> Data;
 
-        public async Task<MetaData> GetMetaDataAsync(MediaFile mediaFile, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<MetaData> GetMetaDataAsync(MediaFile mediaFile, CancellationToken cancellationToken = default)
         {
             var parameters = new FFmpegParameters
             {
@@ -37,7 +31,7 @@ namespace FFmpeg.NET.Engine
             return parameters.InputFile.MetaData;
         }
 
-        public async Task<MediaFile> GetThumbnailAsync(MediaFile input, MediaFile output, ConversionOptions options, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<MediaFile> GetThumbnailAsync(MediaFile input, MediaFile output, ConversionOptions options, CancellationToken cancellationToken = default)
         {
             var parameters = new FFmpegParameters
             {
@@ -51,7 +45,7 @@ namespace FFmpeg.NET.Engine
             return parameters.OutputFile;
         }
 
-        public async Task<MediaFile> ConvertAsync(MediaFile input, MediaFile output, ConversionOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<MediaFile> ConvertAsync(MediaFile input, MediaFile output, ConversionOptions options = null, CancellationToken cancellationToken = default)
         {
             var parameters = new FFmpegParameters
             {
@@ -65,14 +59,20 @@ namespace FFmpeg.NET.Engine
             return parameters.OutputFile;
         }
 
-        private async Task ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken = default)
         {
             var ffmpegProcess = new FFmpegProcess();
             ffmpegProcess.Progress += OnProgress;
             ffmpegProcess.Completed += OnComplete;
             ffmpegProcess.Error += OnError;
             ffmpegProcess.Data += OnData;
-            await ffmpegProcess.ExecuteAsync(parameters, FFmpegExecutable, cancellationToken);
+            await ffmpegProcess.ExecuteAsync(parameters, _ffmpegPath, cancellationToken);
+        }
+
+        public async Task ExecuteAsync(string arguments, CancellationToken cancellationToken = default)
+        {
+            var parameters = new FFmpegParameters { CustomArguments = arguments };
+            await ExecuteAsync(parameters, cancellationToken);
         }
 
         private void OnProgress(ConversionProgressEventArgs e) => Progress?.Invoke(this, e);

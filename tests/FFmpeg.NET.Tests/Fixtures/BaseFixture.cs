@@ -29,5 +29,7 @@ namespace FFmpeg.NET.Tests.Fixtures
                 }
             }
         }
+
+        public string FFmpegPath => Environment.GetEnvironmentVariable("FFMPEG");
     }
 }

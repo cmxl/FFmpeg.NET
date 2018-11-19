@@ -9,6 +9,9 @@ namespace FFmpeg.NET.Engine
     {
         public string Build(FFmpegParameters parameters)
         {
+            if (parameters.HasCustomArguments)
+                return parameters.CustomArguments;
+
             switch (parameters.Task)
             {
                 case FFmpegTask.Convert:

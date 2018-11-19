@@ -16,7 +16,7 @@ namespace FFmpeg.NET.Tests
         [Fact]
         public async Task FFmpeg_Can_Read_Audio_Metadata()
         {
-            var ffmpeg = new Engine.FFmpeg();
+            var ffmpeg = new Engine.FFmpeg(_fixture.FFmpegPath);
 
             var audioFile = _fixture.AudioFile;
             var metaData = await ffmpeg.GetMetaDataAsync(audioFile);
@@ -37,7 +37,7 @@ namespace FFmpeg.NET.Tests
         [Fact]
         public async Task FFmpeg_Can_Read_Video_Metadata()
         {
-            var ffmpeg = new Engine.FFmpeg();
+            var ffmpeg = new Engine.FFmpeg(_fixture.FFmpegPath);
 
             var videoFile = _fixture.VideoFile;
             var metaData = await ffmpeg.GetMetaDataAsync(videoFile);
@@ -56,6 +56,13 @@ namespace FFmpeg.NET.Tests
             Assert.Equal("48000 Hz", metaData.AudioData.SampleRate);
             Assert.Equal("5.1", metaData.AudioData.ChannelOutput);
             Assert.Equal(384, metaData.AudioData.BitRateKbs);
+        }
+
+        [Fact]
+        public async Task CustomParameters()
+        {
+            var ffmpeg = new Engine.FFmpeg(_fixture.FFmpegPath);
+            await ffmpeg.ExecuteAsync($"-i \"{_fixture.VideoFile.FileInfo.FullName}\" -f ffmetadata -");
         }
     }
 }
