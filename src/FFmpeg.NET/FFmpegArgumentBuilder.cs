@@ -31,9 +31,10 @@ namespace FFmpeg.NET
 
         private static string GetThumbnail(MediaFile inputFile, MediaFile outputFile, ConversionOptions conversionOptions)
         {
+            var defaultTimeSpan = TimeSpan.FromSeconds(1);
             var commandBuilder = new StringBuilder();
 
-            commandBuilder.AppendFormat(CultureInfo.InvariantCulture, " -ss {0} ", conversionOptions.Seek.GetValueOrDefault(TimeSpan.FromSeconds(1)).TotalSeconds);
+            commandBuilder.AppendFormat(CultureInfo.InvariantCulture, " -ss {0} ", conversionOptions?.Seek.GetValueOrDefault(defaultTimeSpan).TotalSeconds ?? defaultTimeSpan.TotalSeconds);
 
             commandBuilder.AppendFormat(" -i \"{0}\" ", inputFile.FileInfo.FullName);
             commandBuilder.AppendFormat(" -vframes {0} ", 1);

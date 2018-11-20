@@ -12,6 +12,7 @@ namespace FFmpeg.NET.Sample
             {
                 var inputFile = new MediaFile(@"..\..\..\..\..\tests\FFmpeg.NET.Tests\MediaFiles\SampleVideo_1280x720_1mb.mp4");
                 var outputFile = new MediaFile(@"output.mkv");
+                var thumbNailFile = new MediaFile(@"thumb.png");
 
                 var ffmpeg = new Engine(@"..\..\..\..\..\lib\ffmpeg\v4\ffmpeg.exe");
                 ffmpeg.Progress += OnProgress;
@@ -19,8 +20,8 @@ namespace FFmpeg.NET.Sample
                 ffmpeg.Error += OnError;
                 ffmpeg.Complete += OnComplete;
                 var output = await ffmpeg.ConvertAsync(inputFile, outputFile);
+                var thumbNail = await ffmpeg.GetThumbnailAsync(output, thumbNailFile, new ConversionOptions { Seek = TimeSpan.FromSeconds(3) });
                 var metadata = await ffmpeg.GetMetaDataAsync(output);
-
                 Console.WriteLine(metadata.FileInfo.FullName);
                 Console.WriteLine(metadata);
             }

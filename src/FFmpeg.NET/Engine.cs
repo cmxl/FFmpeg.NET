@@ -31,6 +31,9 @@ namespace FFmpeg.NET
             return parameters.InputFile.MetaData;
         }
 
+        public async Task<MediaFile> GetThumbnailAsync(MediaFile input, MediaFile output, CancellationToken cancellationToken = default)
+            => await GetThumbnailAsync(input, output, default, cancellationToken);
+
         public async Task<MediaFile> GetThumbnailAsync(MediaFile input, MediaFile output, ConversionOptions options, CancellationToken cancellationToken = default)
         {
             var parameters = new FFmpegParameters
@@ -45,7 +48,10 @@ namespace FFmpeg.NET
             return parameters.OutputFile;
         }
 
-        public async Task<MediaFile> ConvertAsync(MediaFile input, MediaFile output, ConversionOptions options = null, CancellationToken cancellationToken = default)
+        public async Task<MediaFile> ConvertAsync(MediaFile input, MediaFile output, CancellationToken cancellationToken = default)
+            => await ConvertAsync(input, output, default, cancellationToken);
+
+        public async Task<MediaFile> ConvertAsync(MediaFile input, MediaFile output, ConversionOptions options, CancellationToken cancellationToken = default)
         {
             var parameters = new FFmpegParameters
             {
