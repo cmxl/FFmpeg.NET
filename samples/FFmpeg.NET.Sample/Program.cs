@@ -1,6 +1,5 @@
 ﻿using FFmpeg.NET.Events;
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace FFmpeg.NET.Sample
@@ -14,7 +13,7 @@ namespace FFmpeg.NET.Sample
                 var inputFile = new MediaFile(@"..\..\..\..\..\tests\FFmpeg.NET.Tests\MediaFiles\SampleVideo_1280x720_1mb.mp4");
                 var outputFile = new MediaFile(@"output.mkv");
 
-                var ffmpeg = new Engine.FFmpeg(@"..\..\..\..\..\lib\ffmpeg\v4\ffmpeg.exe");
+                var ffmpeg = new Engine(@"..\..\..\..\..\lib\ffmpeg\v4\ffmpeg.exe");
                 ffmpeg.Progress += OnProgress;
                 ffmpeg.Data += OnData;
                 ffmpeg.Error += OnError;

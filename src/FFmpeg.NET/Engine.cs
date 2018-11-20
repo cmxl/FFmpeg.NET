@@ -3,13 +3,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FFmpeg.NET.Engine
+namespace FFmpeg.NET
 {
-    public sealed class FFmpeg
+    public sealed class Engine
     {
         private readonly string _ffmpegPath;
 
-        public FFmpeg(string ffmpegPath)
+        public Engine(string ffmpegPath)
         {
             _ffmpegPath = ffmpegPath ?? throw new ArgumentNullException(ffmpegPath, "FFmpeg executable path needs to be provided.");
         }

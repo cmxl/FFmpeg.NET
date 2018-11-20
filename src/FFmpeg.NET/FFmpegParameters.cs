@@ -1,4 +1,4 @@
-﻿namespace FFmpeg.NET.Engine
+﻿namespace FFmpeg.NET
 {
     internal class FFmpegParameters
     {

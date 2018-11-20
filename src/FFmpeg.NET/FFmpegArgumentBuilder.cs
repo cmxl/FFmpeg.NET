@@ -3,7 +3,7 @@ using System;
 using System.Globalization;
 using System.Text;
 
-namespace FFmpeg.NET.Engine
+namespace FFmpeg.NET
 {
     internal class FFmpegArgumentBuilder
     {
@@ -47,7 +47,7 @@ namespace FFmpeg.NET.Engine
 
             // Default conversion
             if (conversionOptions == null)
-                return commandBuilder.AppendFormat(" -i \"{0}\"  \"{1}\" ", inputFile.FileInfo.FullName, outputFile.FileInfo.FullName).ToString();
+                return commandBuilder.AppendFormat(" -i \"{0}\" \"{1}\" ", inputFile.FileInfo.FullName, outputFile.FileInfo.FullName).ToString();
 
             // Media seek position
             if (conversionOptions.Seek != null)

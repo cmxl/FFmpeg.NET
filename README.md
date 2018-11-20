@@ -57,7 +57,7 @@ Install [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) from nuget.org Package 
 ## Samples
 
 - [Grab thumbnail from a video](#grab-thumbnail-from-a-video)
-- [Retrieve metadata](#retrieve-metadata)  
+- [Retrieve metadata](#retrieve-metadata)  new Engine
 - [Perform basic video conversions](#basic-conversion)  
 - [Convert from FLV to DVD](#convert-flash-video-to-dvd)  
 - [Convert FLV to MP4 using various transcoding options](#transcoding-options-flv-to-mp4)  
@@ -70,7 +70,7 @@ Install [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) from nuget.org Package 
 var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
 var outputFile = new MediaFile (@"C:\Path\To_Save_Image.jpg");
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
+var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
 // Saves the frame located on the 15th second of the video.
 var options = new ConversionOptions { Seek = TimeSpan.FromSeconds(15) };
 await ffmpeg.GetThumbnailAsync(inputFile, outputFile, options);
@@ -81,7 +81,7 @@ await ffmpeg.GetThumbnailAsync(inputFile, outputFile, options);
 ```csharp
 var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
+var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
 var metadata = await ffmpeg.GetMetadataAsync(inputFile);
 
 Console.WriteLine(metadata.Duration);
@@ -93,7 +93,7 @@ Console.WriteLine(metadata.Duration);
 var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
 var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
+var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
 await ffmpeg.ConvertAsync(inputFile, outputFile);
 ```
 
@@ -109,7 +109,7 @@ var conversionOptions = new ConversionOptions
     TargetStandard = TargetStandard.PAL
 };
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
+var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
 await ffmpeg.ConvertAsync(inputFile, outputFile, conversionOptions);
 ```
 
@@ -127,7 +127,7 @@ var conversionOptions = new ConversionOptions
     AudioSampleRate = AudioSampleRate.Hz44100
 };
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
+var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
 await ffmpeg.ConvertAsync(inputFile, outputFile, conversionOptions);
 ```
 
@@ -137,7 +137,7 @@ await ffmpeg.ConvertAsync(inputFile, outputFile, conversionOptions);
 var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
 var outputFile = new MediaFile (@"C:\Path\To_Save_ExtractedVideo.flv");
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
+var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
 var options = new ConversionOptions();
 
 // This example will create a 25 second video, starting from the 
@@ -156,7 +156,7 @@ public async Task StartConverting()
     var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
     var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");
 
-    var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
+    var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
     ffmpeg.Progress += OnProgress;
     ffmpeg.Data += OnData;
     ffmpeg.Error += OnError;

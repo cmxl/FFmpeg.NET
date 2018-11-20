@@ -16,7 +16,7 @@ namespace FFmpeg.NET.Tests
         [Fact]
         public async Task FFmpeg_Can_Read_Audio_Metadata()
         {
-            var ffmpeg = new Engine.FFmpeg(_fixture.FFmpegPath);
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
 
             var audioFile = _fixture.AudioFile;
             var metaData = await ffmpeg.GetMetaDataAsync(audioFile);
@@ -37,7 +37,7 @@ namespace FFmpeg.NET.Tests
         [Fact]
         public async Task FFmpeg_Can_Read_Video_Metadata()
         {
-            var ffmpeg = new Engine.FFmpeg(_fixture.FFmpegPath);
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
 
             var videoFile = _fixture.VideoFile;
             var metaData = await ffmpeg.GetMetaDataAsync(videoFile);
@@ -61,7 +61,7 @@ namespace FFmpeg.NET.Tests
         [Fact]
         public async Task CustomParameters()
         {
-            var ffmpeg = new Engine.FFmpeg(_fixture.FFmpegPath);
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
             await ffmpeg.ExecuteAsync($"-i \"{_fixture.VideoFile.FileInfo.FullName}\" -f ffmetadata -");
         }
     }

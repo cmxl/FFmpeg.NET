@@ -1,4 +1,4 @@
-﻿using FFmpeg.NET.Engine.Models;
+﻿using FFmpeg.NET.Models;
 using System;
 
 namespace FFmpeg.NET.Events

@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FFmpeg.NET.Engine
+namespace FFmpeg.NET
 {
     internal sealed class FFmpegProcess
     {
@@ -68,7 +68,7 @@ namespace FFmpeg.NET.Engine
                     RegexEngine.TestVideo(e.Data, parameters);
                     RegexEngine.TestAudio(e.Data, parameters);
 
-                    var matchDuration = RegexEngine.Index[RegexEngine.Find.Duration].Match(e.Data);
+                    var matchDuration = RegexEngine._index[RegexEngine.Find.Duration].Match(e.Data);
                     if (matchDuration.Success)
                     {
                         if (parameters.InputFile.MetaData == null)

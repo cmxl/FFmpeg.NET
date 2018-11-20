@@ -1,7 +1,7 @@
 ﻿using System;
 using FFmpeg.NET.Enums;
 
-namespace FFmpeg.NET.Engine
+namespace FFmpeg.NET
 {
     public class ConversionOptions
     {

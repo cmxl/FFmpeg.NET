@@ -23,7 +23,7 @@ namespace FFmpeg.NET.Tests
         public async Task FFmpeg_Invokes_ConversionCompleteEvent()
         {
             var output = new MediaFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.mp4")));
-            var ffmpeg = new Engine.FFmpeg(_fixture.FFmpegPath);
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
 
             var e = await Assert.RaisesAsync<ConversionCompleteEventArgs>(
                 x => ffmpeg.Complete += x,
@@ -44,7 +44,7 @@ namespace FFmpeg.NET.Tests
         [Fact]
         public async Task FFmpeg_Should_Throw_Exception_On_Invalid_OutputFile()
         {
-            var ffmpeg = new Engine.FFmpeg(_fixture.FFmpegPath);
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
             var output = new MediaFile("test.txt");
             var input = _fixture.VideoFile;
 

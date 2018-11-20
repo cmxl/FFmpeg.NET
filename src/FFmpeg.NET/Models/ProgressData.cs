@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FFmpeg.NET.Engine.Models
+namespace FFmpeg.NET.Models
 {
     internal class ProgressData
     {
