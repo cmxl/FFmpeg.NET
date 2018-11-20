@@ -8,7 +8,7 @@ Under the hood, [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) is a .NET wrapp
 Some major parts are taken from https://github.com/AydinAdn/MediaToolkit.
 Many features have been refactored. The library has been ported to Netstandard and made threadsafe.
 
-You need to provide the ffmpeg executable path to the `Engine.FFmpeg` instance.
+You need to provide the ffmpeg executable path to the `Engine` constructor.
 
 ## Project Health
 
