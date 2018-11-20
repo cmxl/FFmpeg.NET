@@ -81,7 +81,7 @@ await ffmpeg.GetThumbnailAsync(inputFile, outputFile, options);
 ```csharp
 var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
+var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
 var metadata = await ffmpeg.GetMetadataAsync(inputFile);
 
 Console.WriteLine(metadata.Duration);
@@ -93,7 +93,7 @@ Console.WriteLine(metadata.Duration);
 var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
 var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
+var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
 await ffmpeg.ConvertAsync(inputFile, outputFile);
 ```
 
@@ -109,7 +109,7 @@ var conversionOptions = new ConversionOptions
     TargetStandard = TargetStandard.PAL
 };
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
+var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
 await ffmpeg.ConvertAsync(inputFile, outputFile, conversionOptions);
 ```
 
@@ -127,7 +127,7 @@ var conversionOptions = new ConversionOptions
     AudioSampleRate = AudioSampleRate.Hz44100
 };
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
+var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
 await ffmpeg.ConvertAsync(inputFile, outputFile, conversionOptions);
 ```
 
@@ -137,7 +137,7 @@ await ffmpeg.ConvertAsync(inputFile, outputFile, conversionOptions);
 var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
 var outputFile = new MediaFile (@"C:\Path\To_Save_ExtractedVideo.flv");
 
-var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
+var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
 var options = new ConversionOptions();
 
 // This example will create a 25 second video, starting from the 
@@ -156,7 +156,7 @@ public async Task StartConverting()
     var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
     var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");
 
-    var ffmpeg = new FFmpeg.NET.Engine.FFmpeg();
+    var ffmpeg = new FFmpeg.NET.Engine.FFmpeg("C:\\ffmpeg\\ffmpeg.exe");
     ffmpeg.Progress += OnProgress;
     ffmpeg.Data += OnData;
     ffmpeg.Error += OnError;
