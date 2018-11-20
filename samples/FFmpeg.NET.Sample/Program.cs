@@ -1,5 +1,6 @@
 ﻿using FFmpeg.NET.Events;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace FFmpeg.NET.Sample
@@ -8,21 +9,36 @@ namespace FFmpeg.NET.Sample
     {
         private static async Task Main(string[] args)
         {
-            var inputFile = new MediaFile(@"..\..\..\..\..\tests\FFmpeg.NET.Tests\MediaFiles\SampleVideo_1280x720_1mb.mp4");
-            var outputFile = new MediaFile(@"output.mkv");
+            try
+            {
+                var inputFile = new MediaFile(@"..\..\..\..\..\tests\FFmpeg.NET.Tests\MediaFiles\SampleVideo_1280x720_1mb.mp4");
+                var outputFile = new MediaFile(@"output.mkv");
 
-            var ffmpeg = new Engine.FFmpeg(@"..\..\..\..\..\lib\ffmpeg\v4\ffmpeg.exe");
-            ffmpeg.Progress += OnProgress;
-            ffmpeg.Data += OnData;
-            ffmpeg.Error += OnError;
-            ffmpeg.Complete += OnComplete;
-            await ffmpeg.ConvertAsync(inputFile, outputFile);
-            Console.ReadLine();
+                var ffmpeg = new Engine.FFmpeg(@"..\..\..\..\..\lib\ffmpeg\v4\ffmpeg.exe");
+                ffmpeg.Progress += OnProgress;
+                ffmpeg.Data += OnData;
+                ffmpeg.Error += OnError;
+                ffmpeg.Complete += OnComplete;
+                var output = await ffmpeg.ConvertAsync(inputFile, outputFile);
+                var metadata = await ffmpeg.GetMetaDataAsync(output);
+
+                Console.WriteLine(metadata.FileInfo.FullName);
+                Console.WriteLine(metadata);
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine(exc);
+            }
+            finally
+            {
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
+            }
         }
 
         private static void OnProgress(object sender, ConversionProgressEventArgs e)
         {
-            Console.WriteLine("[{0} => {1}]", e.Input.FileInfo.Name, e.Output.FileInfo.Name);
+            Console.WriteLine("[{0} => {1}]", e.Input.FileInfo.Name, e.Output?.FileInfo.Name);
             Console.WriteLine("Bitrate: {0}", e.Bitrate);
             Console.WriteLine("Fps: {0}", e.Fps);
             Console.WriteLine("Frame: {0}", e.Frame);
@@ -32,12 +48,12 @@ namespace FFmpeg.NET.Sample
         }
 
         private static void OnData(object sender, ConversionDataEventArgs e)
-            => Console.WriteLine("[{0} => {1}]: {2}", e.Input.FileInfo.Name, e.Output.FileInfo.Name, e.Data);
+            => Console.WriteLine("[{0} => {1}]: {2}", e.Input.FileInfo.Name, e.Output?.FileInfo.Name, e.Data);
 
-        private static void OnComplete(object sender, ConversionCompleteEventArgs e) 
-            => Console.WriteLine("Completed conversion from {0} to {1}", e.Input.FileInfo.FullName, e.Output.FileInfo.FullName);
+        private static void OnComplete(object sender, ConversionCompleteEventArgs e)
+            => Console.WriteLine("Completed conversion from {0} to {1}", e.Input.FileInfo.FullName, e.Output?.FileInfo.FullName);
 
-        private static void OnError(object sender, ConversionErrorEventArgs e) 
-            => Console.WriteLine("[{0} => {1}]: Error: {2}\n{3}", e.Input.FileInfo.Name, e.Output.FileInfo.Name, e.Exception.ExitCode, e.Exception.InnerException);
+        private static void OnError(object sender, ConversionErrorEventArgs e)
+            => Console.WriteLine("[{0} => {1}]: Error: {2}\n{3}", e.Input.FileInfo.Name, e.Output?.FileInfo.Name, e.Exception.ExitCode, e.Exception.InnerException);
     }
 }

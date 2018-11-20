@@ -14,10 +14,8 @@ namespace FFmpeg.NET
         public Audio AudioData { get; internal set; }
         public FileInfo FileInfo { get; internal set; }
 
-        public override string ToString()
-        {
-            return $"Duration: {Duration}\nVideo MetaData:\n{VideoData}\nAudio MetaData:\n{AudioData}";
-        }
+        public override string ToString() 
+            => $"Duration: {Duration}\nVideo MetaData:\n{VideoData}\nAudio MetaData:\n{AudioData}";
 
         public class Video
         {
@@ -31,10 +29,8 @@ namespace FFmpeg.NET
             public int? BitRateKbs { get; internal set; }
             public double Fps { get; internal set; }
 
-            public override string ToString()
-            {
-                return $"Format: {Format}\nColorModel: {ColorModel}\nFrameSize: {FrameSize}\nBitRateKbs: {BitRateKbs}\nFps: {Fps}";
-            }
+            public override string ToString() 
+                => $"Format: {Format}\nColorModel: {ColorModel}\nFrameSize: {FrameSize}\nBitRateKbs: {BitRateKbs}\nFps: {Fps}";
         }
 
         public class Audio
@@ -48,10 +44,8 @@ namespace FFmpeg.NET
             public string ChannelOutput { get; internal set; }
             public int BitRateKbs { get; internal set; }
 
-            public override string ToString()
-            {
-                return $"Format: {Format}\nSampleRate: {SampleRate}\nChannelOuput: {ChannelOutput}\nBitRateKbs: {BitRateKbs}";
-            }
+            public override string ToString() 
+                => $"Format: {Format}\nSampleRate: {SampleRate}\nChannelOuput: {ChannelOutput}\nBitRateKbs: {BitRateKbs}";
         }
     }
 }
