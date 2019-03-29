@@ -38,13 +38,13 @@ namespace FFmpeg.NET
                 catch (Exception)
                 {
                     // An exception occurs if the user cancels the operation by calling Cancel on the CancellationToken.
-                    // Exc.Message will be "A task was calceled." (in English).
+                    // Exc.Message will be "A task was canceled." (in English).
                     // task.IsCanceled will be true.
                     if (task.IsCanceled)
                     {
                         throw new TaskCanceledException(task);
                     }
-                    // I don't think this can occur, but if some other exception, rethrow it. 
+                    // I don't think this can occur, but if some other exception, rethrow it.
                     throw;
                 }
                 if (caughtException != null || ffmpegProcess.ExitCode != 0)
@@ -65,7 +65,7 @@ namespace FFmpeg.NET
             OnConversionError(new ConversionErrorEventArgs(exception, parameters.InputFile, parameters.OutputFile));
         }
 
-        private string GetExceptionMessage(List<string> messages) 
+        private string GetExceptionMessage(List<string> messages)
             => messages.Count > 1
                 ? messages[1] + messages[0]
                 : string.Join(string.Empty, messages);

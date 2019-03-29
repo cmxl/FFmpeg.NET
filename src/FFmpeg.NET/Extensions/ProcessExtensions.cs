@@ -26,7 +26,7 @@ namespace FFmpeg.NET.Extensions
                     finally
                     {
                         // Cancel the task. This will throw an exception to the calling program.
-                        // Exc.Message will be "A task was calceled."
+                        // Exc.Message will be "A task was canceled."
                         try
                         {
                             tcs.SetCanceled();
