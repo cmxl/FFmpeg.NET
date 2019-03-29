@@ -50,7 +50,7 @@ namespace FFmpeg.NET
             var matchTime = _index[Find.ConvertProgressTime].Match(data);
             var matchBitrate = _index[Find.ConvertProgressBitrate].Match(data);
 
-            if (!matchSize.Success || !matchTime.Success || !matchBitrate.Success)
+            if (!matchTime.Success)
                 return false;
 
             TimeSpan.TryParse(matchTime.Groups[1].Value, out var processedDuration);
