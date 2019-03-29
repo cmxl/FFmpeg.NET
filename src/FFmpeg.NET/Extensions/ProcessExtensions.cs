@@ -9,9 +9,34 @@ namespace FFmpeg.NET.Extensions
     {
         public static Task<int> WaitForExitAsync(this Process process, Action<int> onException, CancellationToken cancellationToken = default)
         {
-            var tcs = new TaskCompletionSource<int>();
+            TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
             if (cancellationToken != default)
-                cancellationToken.Register(tcs.SetCanceled);
+            {
+                cancellationToken.Register(() =>
+                {
+                    try
+                    {
+                        // Send "q" to ffmpeg, which will force it to stop (closing files).
+                        process.StandardInput.Write("q");
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // If the process doesn't exist anymore, ignore it.
+                    }
+                    finally
+                    {
+                        // Cancel the task. This will throw an exception to the calling program.
+                        // Exc.Message will be "A task was calceled."
+                        try
+                        {
+                            tcs.SetCanceled();
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                });
+            }
 
             process.EnableRaisingEvents = true;
             process.Exited += (sender, e) =>
