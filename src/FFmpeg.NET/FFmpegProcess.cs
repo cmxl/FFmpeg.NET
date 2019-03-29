@@ -74,7 +74,7 @@ namespace FFmpeg.NET
                         if (parameters.InputFile.MetaData == null)
                             parameters.InputFile.MetaData = new MetaData { FileInfo = parameters.InputFile.FileInfo };
 
-                        TimeSpan.TryParse(matchDuration.Groups[1].Value, out totalMediaDuration);
+                        RegexEngine.TimeSpanLargeTryParse(matchDuration.Groups[1].Value, out totalMediaDuration);
                         parameters.InputFile.MetaData.Duration = totalMediaDuration;
                     }
                 }

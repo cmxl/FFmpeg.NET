@@ -53,7 +53,7 @@ namespace FFmpeg.NET
             if (!matchSize.Success || !matchTime.Success || !matchBitrate.Success)
                 return false;
 
-            TimeSpan.TryParse(matchTime.Groups[1].Value, out var processedDuration);
+            TimeSpanLargeTryParse(matchTime.Groups[1].Value, out var processedDuration);
 
             var frame = GetLongValue(matchFrame);
             var fps = GetDoubleValue(matchFps);
@@ -64,6 +64,40 @@ namespace FFmpeg.NET
 
             return true;
         }
+
+		// Parse timespan string as returned by ffmpeg. No days, allow hours to
+		// exceed 23.
+		internal static bool TimeSpanLargeTryParse(string str, out TimeSpan result)
+		{
+			result = TimeSpan.Zero;
+
+            // Process hours.
+            int hours = 0;
+            int start = 0;
+            int end = str.IndexOf(':', start);
+            if (end < 0)
+                return false;
+            if (!int.TryParse(str.Substring(start, end - start), out hours))
+                return false;
+
+            // Process minutes
+            int minutes = 0;
+            start = end + 1;
+            end = str.IndexOf(':', start);
+            if (end < 0)
+                return false;
+            if (!int.TryParse(str.Substring(start, end - start), out minutes))
+                return false;
+
+            // Process seconds
+            double seconds = 0.0;
+            start = end + 1;
+            if (!double.TryParse(str.Substring(start), out seconds))
+                return false;
+
+            result = new TimeSpan(0, hours, minutes, 0, (int)Math.Round(seconds * 1000.0));
+            return true;
+		}
 
         private static long? GetLongValue(Match match)
             => long.TryParse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
