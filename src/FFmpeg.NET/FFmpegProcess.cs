@@ -29,7 +29,7 @@ namespace FFmpeg.NET
                 ffmpegProcess.ErrorDataReceived += (sender, e) => OnData(new ConversionDataEventArgs(e.Data, parameters.InputFile, parameters.OutputFile));
                 ffmpegProcess.ErrorDataReceived += (sender, e) => FFmpegProcessOnErrorDataReceived(e, parameters, ref caughtException, messages);
 
-                await ffmpegProcess.WaitForExitAsync((exitCode) => OnException(messages, parameters, exitCode, caughtException), cancellationToken);
+                await ffmpegProcess.WaitForExitAsync(null, cancellationToken);
 
                 if (caughtException != null || ffmpegProcess.ExitCode != 0)
                 {
