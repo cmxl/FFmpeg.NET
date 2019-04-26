@@ -29,8 +29,24 @@ namespace FFmpeg.NET
                 ffmpegProcess.ErrorDataReceived += (sender, e) => OnData(new ConversionDataEventArgs(e.Data, parameters.InputFile, parameters.OutputFile));
                 ffmpegProcess.ErrorDataReceived += (sender, e) => FFmpegProcessOnErrorDataReceived(e, parameters, ref caughtException, messages);
 
-                await ffmpegProcess.WaitForExitAsync((exitCode) => OnException(messages, parameters, exitCode, caughtException), cancellationToken);
-
+                Task<int> task = null;
+                try
+                {
+                    task = ffmpegProcess.WaitForExitAsync((exitCode) => OnException(messages, parameters, exitCode, caughtException), cancellationToken);
+                    await task;
+                }
+                catch (Exception)
+                {
+                    // An exception occurs if the user cancels the operation by calling Cancel on the CancellationToken.
+                    // Exc.Message will be "A task was canceled." (in English).
+                    // task.IsCanceled will be true.
+                    if (task.IsCanceled)
+                    {
+                        throw new TaskCanceledException(task);
+                    }
+                    // I don't think this can occur, but if some other exception, rethrow it.
+                    throw;
+                }
                 if (caughtException != null || ffmpegProcess.ExitCode != 0)
                 {
                     OnException(messages, parameters, ffmpegProcess.ExitCode, caughtException);
@@ -49,7 +65,7 @@ namespace FFmpeg.NET
             OnConversionError(new ConversionErrorEventArgs(exception, parameters.InputFile, parameters.OutputFile));
         }
 
-        private string GetExceptionMessage(List<string> messages) 
+        private string GetExceptionMessage(List<string> messages)
             => messages.Count > 1
                 ? messages[1] + messages[0]
                 : string.Join(string.Empty, messages);
@@ -93,10 +109,11 @@ namespace FFmpeg.NET
 
         private ProcessStartInfo GenerateStartInfo(string ffmpegPath, string arguments) => new ProcessStartInfo
         {
-            Arguments = "-nostdin -y -loglevel info " + arguments,
+            // -y overwrite output files
+            Arguments = "-y " + arguments,
             FileName = ffmpegPath,
             CreateNoWindow = true,
-            RedirectStandardInput = false,
+            RedirectStandardInput = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
