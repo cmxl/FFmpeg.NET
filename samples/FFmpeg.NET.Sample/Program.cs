@@ -1,4 +1,5 @@
-﻿using FFmpeg.NET.Events;
+﻿using FFmpeg.NET.Enums;
+using FFmpeg.NET.Events;
 using System;
 using System.Threading.Tasks;
 
@@ -10,6 +11,9 @@ namespace FFmpeg.NET.Sample
         {
             try
             {
+                // capture desktop with ffmpeg
+                // ffmpeg -y -f gdigrab -framerate 10 -video_size 1920x1080 -i desktop output.mp4
+
                 var inputFile = new MediaFile(@"..\..\..\..\..\tests\FFmpeg.NET.Tests\MediaFiles\SampleVideo_1280x720_1mb.mp4");
                 var outputFile = new MediaFile(@"output.mkv");
                 var thumbNailFile = new MediaFile(@"thumb.png");
@@ -20,7 +24,13 @@ namespace FFmpeg.NET.Sample
                 ffmpeg.Error += OnError;
                 ffmpeg.Complete += OnComplete;
                 var output = await ffmpeg.ConvertAsync(inputFile, outputFile);
-                var thumbNail = await ffmpeg.GetThumbnailAsync(output, thumbNailFile, new ConversionOptions { Seek = TimeSpan.FromSeconds(3) });
+                var thumbNail = await ffmpeg.GetThumbnailAsync(output, thumbNailFile,
+                    new ConversionOptions
+                    {
+                        Seek = TimeSpan.FromSeconds(3),
+                        VideoSize = Enums.VideoSize.Custom,
+                        SourceCrop = new CropRectangle { X = 100, Width = 200, Y = 100, Height = 100 }
+                    });
                 var metadata = await ffmpeg.GetMetaDataAsync(output);
                 Console.WriteLine(metadata.FileInfo.FullName);
                 Console.WriteLine(metadata);
