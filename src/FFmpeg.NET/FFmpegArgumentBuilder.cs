@@ -39,6 +39,15 @@ namespace FFmpeg.NET
             commandBuilder.AppendFormat(" -i \"{0}\" ", inputFile.FileInfo.FullName);
             commandBuilder.AppendFormat(" -vframes {0} ", 1);
 
+            // Video size / resolution
+            commandBuilder = AppendVideoSize(commandBuilder, conversionOptions);
+
+            // Video aspect ratio
+            commandBuilder = AppendVideoAspectRatio(commandBuilder, conversionOptions);
+
+            // Video cropping
+            commandBuilder = AppendVideoCropping(commandBuilder, conversionOptions);
+
             return commandBuilder.AppendFormat(" \"{0}\" ", outputFile.FileInfo.FullName).ToString();
         }
 
@@ -93,6 +102,45 @@ namespace FFmpeg.NET
                 commandBuilder.AppendFormat(" -r {0} ", conversionOptions.VideoFps);
 
             // Video size / resolution
+            commandBuilder = AppendVideoSize(commandBuilder, conversionOptions);
+
+            // Video aspect ratio
+            commandBuilder = AppendVideoAspectRatio(commandBuilder, conversionOptions);
+
+            // Video cropping
+            commandBuilder = AppendVideoCropping(commandBuilder, conversionOptions);
+
+            if (conversionOptions.BaselineProfile)
+                commandBuilder.Append(" -profile:v baseline ");
+
+            return commandBuilder.AppendFormat(" \"{0}\" ", outputFile.FileInfo.FullName).ToString();
+        }
+
+        private static StringBuilder AppendVideoCropping(StringBuilder commandBuilder, ConversionOptions conversionOptions)
+        {
+            if (conversionOptions.SourceCrop != null)
+            {
+                var crop = conversionOptions.SourceCrop;
+                commandBuilder.AppendFormat(" -filter:v \"crop={0}:{1}:{2}:{3}\" ", crop.Width, crop.Height, crop.X, crop.Y);
+            }
+            return commandBuilder;
+        }
+
+        private static StringBuilder AppendVideoAspectRatio(StringBuilder commandBuilder, ConversionOptions conversionOptions)
+        {
+            if (conversionOptions.VideoAspectRatio != VideoAspectRatio.Default)
+            {
+                var ratio = conversionOptions.VideoAspectRatio.ToString();
+                ratio = ratio.Substring(1);
+                ratio = ratio.Replace("_", ":");
+
+                commandBuilder.AppendFormat(" -aspect {0} ", ratio);
+            }
+            return commandBuilder;
+        }
+
+        private static StringBuilder AppendVideoSize(StringBuilder commandBuilder, ConversionOptions conversionOptions)
+        {
             if (conversionOptions.VideoSize == VideoSize.Custom)
             {
                 commandBuilder.AppendFormat(" -vf \"scale={0}:{1}\" ", conversionOptions.CustomWidth ?? -2, conversionOptions.CustomHeight ?? -2);
@@ -107,28 +155,7 @@ namespace FFmpeg.NET
 
                 commandBuilder.AppendFormat(" -s {0} ", size);
             }
-
-            // Video aspect ratio
-            if (conversionOptions.VideoAspectRatio != VideoAspectRatio.Default)
-            {
-                var ratio = conversionOptions.VideoAspectRatio.ToString();
-                ratio = ratio.Substring(1);
-                ratio = ratio.Replace("_", ":");
-
-                commandBuilder.AppendFormat(" -aspect {0} ", ratio);
-            }
-
-            // Video cropping
-            if (conversionOptions.SourceCrop != null)
-            {
-                var crop = conversionOptions.SourceCrop;
-                commandBuilder.AppendFormat(" -filter:v \"crop={0}:{1}:{2}:{3}\" ", crop.Width, crop.Height, crop.X, crop.Y);
-            }
-
-            if (conversionOptions.BaselineProfile)
-                commandBuilder.Append(" -profile:v baseline ");
-
-            return commandBuilder.AppendFormat(" \"{0}\" ", outputFile.FileInfo.FullName).ToString();
+            return commandBuilder;
         }
     }
 }
