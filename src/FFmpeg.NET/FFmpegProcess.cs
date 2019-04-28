@@ -32,7 +32,7 @@ namespace FFmpeg.NET
                 Task<int> task = null;
                 try
                 {
-                    task = ffmpegProcess.WaitForExitAsync((exitCode) => OnException(messages, parameters, exitCode, caughtException), cancellationToken);
+                    task = ffmpegProcess.WaitForExitAsync(null, cancellationToken);
                     await task;
                 }
                 catch (Exception)
@@ -47,6 +47,7 @@ namespace FFmpeg.NET
                     // I don't think this can occur, but if some other exception, rethrow it.
                     throw;
                 }
+
                 if (caughtException != null || ffmpegProcess.ExitCode != 0)
                 {
                     OnException(messages, parameters, ffmpegProcess.ExitCode, caughtException);
