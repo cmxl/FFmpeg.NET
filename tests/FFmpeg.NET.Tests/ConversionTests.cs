@@ -5,6 +5,7 @@ using FFmpeg.NET.Events;
 using FFmpeg.NET.Tests.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
+using System.Diagnostics;
 
 namespace FFmpeg.NET.Tests
 {
@@ -18,6 +19,34 @@ namespace FFmpeg.NET.Tests
 
         private readonly MediaFileFixture _fixture;
         private readonly ITestOutputHelper _outputHelper;
+        private TimeSpan _processedDuration = new TimeSpan();
+
+        // Check that progress events are received
+        [Fact]
+        public async Task FFmpeg_Invokes_ProgressEvent()
+        {
+            Engine ffmpeg = new Engine(_fixture.FFmpegPath);
+
+            await MetaDataTests.CreateLongAudioFile(ffmpeg, _fixture.AudioFile);
+
+            FileInfo audioFileInfo = new FileInfo("LongAudio.mp3");
+            MediaFile audioFile = new MediaFile(audioFileInfo);
+            ffmpeg.Progress += Ffmpeg_Progress;
+
+            MediaFile output = new MediaFile("LongAudio.aif");
+            await ffmpeg.ConvertAsync(audioFile, output);
+
+            ffmpeg.Progress -= Ffmpeg_Progress;
+            output.FileInfo.Delete();
+
+            Assert.InRange(_processedDuration.TotalHours, 30.0, 40.0);
+        }
+
+        private void Ffmpeg_Progress(object sender, ConversionProgressEventArgs e)
+        {
+            _processedDuration = e.ProcessedDuration;
+            Debug.WriteLine($"Processed duration hours: {_processedDuration.TotalHours}");
+        }
 
         [Fact]
         public async Task FFmpeg_Invokes_ConversionCompleteEvent()
