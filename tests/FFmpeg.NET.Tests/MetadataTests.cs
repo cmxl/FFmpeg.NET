@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using FFmpeg.NET.Tests.Fixtures;
 using System.Threading.Tasks;
 using Xunit;
@@ -12,6 +14,48 @@ namespace FFmpeg.NET.Tests
         }
 
         private readonly MediaFileFixture _fixture;
+
+        // Create a 31 hour audio file.
+        // Use ffmpeg.exe to copy the audio from SampleAudio_0.4mb.mp3 enough times so that the 
+        // result is > 24 hours in duration. 
+        internal static async Task CreateLongAudioFile(Engine ffmpeg, MediaFile inputFile)
+        {
+            FileInfo outputFileInfo = new FileInfo("LongAudio.mp3");
+            if (outputFileInfo.Exists)
+            {
+                return;
+            }
+
+            MediaFile output = new MediaFile(outputFileInfo);
+            MediaFile temp1 = new MediaFile("Long1.mp3");
+            MediaFile temp2 = new MediaFile("Long2.mp3");
+            MediaFile temp3 = new MediaFile("Long3.mp3");
+            MediaFile temp4 = new MediaFile("Long4.mp3");
+
+            string p = $"-i \"{inputFile.FileInfo.FullName}\" -ar 8K -q:a 9 -ac 1 -f mp3 -y \"{temp1.FileInfo.FullName}\"";
+            await ffmpeg.ExecuteAsync(p);
+
+            string fn = $"{temp1.FileInfo.Name}";
+            p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{temp2.FileInfo.Name}\"";
+            await ffmpeg.ExecuteAsync(p);
+
+            fn = $"{temp2.FileInfo.Name}";
+            p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{temp3.FileInfo.Name}\"";
+            await ffmpeg.ExecuteAsync(p);
+
+            fn = $"{temp3.FileInfo.Name}";
+            p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{temp4.FileInfo.Name}\"";
+            await ffmpeg.ExecuteAsync(p);
+
+            fn = $"{temp4.FileInfo.Name}";
+            p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{output.FileInfo.Name}\"";
+            await ffmpeg.ExecuteAsync(p);
+
+            temp1.FileInfo.Delete();
+            temp2.FileInfo.Delete();
+            temp3.FileInfo.Delete();
+            temp4.FileInfo.Delete();
+        }
 
         [Fact]
         public async Task FFmpeg_Can_Read_Audio_Metadata()
@@ -63,6 +107,23 @@ namespace FFmpeg.NET.Tests
         {
             var ffmpeg = new Engine(_fixture.FFmpegPath);
             await ffmpeg.ExecuteAsync($"-i \"{_fixture.VideoFile.FileInfo.FullName}\" -f ffmetadata -");
+        }
+
+        [Fact]
+        public async Task FFmpeg_Can_Read_Long_Duration()
+        {
+            Engine ffmpeg = new Engine(_fixture.FFmpegPath);
+
+            await CreateLongAudioFile(ffmpeg, _fixture.AudioFile);
+
+            FileInfo audioFileInfo = new FileInfo("LongAudio.mp3");
+            MediaFile audioFile = new MediaFile(audioFileInfo);
+
+            MetaData metaData = await ffmpeg.GetMetaDataAsync(audioFile);
+
+            Assert.NotNull(metaData);
+            Assert.NotNull(metaData.AudioData);
+            Assert.InRange(metaData.Duration.TotalHours, 30.0, 40.0);
         }
     }
 }
