@@ -100,6 +100,8 @@ namespace FFmpeg.NET.Tests
             Assert.Equal("48000 Hz", metaData.AudioData.SampleRate);
             Assert.Equal("5.1", metaData.AudioData.ChannelOutput);
             Assert.Equal(384, metaData.AudioData.BitRateKbs);
+
+            Assert.Equal(metaData.Duration, new TimeSpan(0, 0, 0, 5, 310));
         }
 
         [Fact]
