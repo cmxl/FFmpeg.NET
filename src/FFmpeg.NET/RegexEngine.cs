@@ -92,7 +92,7 @@ namespace FFmpeg.NET
             // Process seconds
             double seconds = 0.0;
             start = end + 1;
-            if (!double.TryParse(str.Substring(start), out seconds))
+            if (!double.TryParse(str.Substring(start), NumberStyles.Any, CultureInfo.InvariantCulture, out seconds))
                 return false;
 
             result = new TimeSpan(0, hours, minutes, 0, (int)Math.Round(seconds * 1000.0));
