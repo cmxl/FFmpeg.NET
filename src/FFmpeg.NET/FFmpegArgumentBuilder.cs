@@ -96,10 +96,14 @@ namespace FFmpeg.NET
             // Video bit rate
             if (conversionOptions.VideoBitRate != null)
                 commandBuilder.AppendFormat(" -b {0}k ", conversionOptions.VideoBitRate);
+            
+              // Video bit rate
+            if (conversionOptions.VideoBitRate != null)
+                commandBuilder.AppendFormat(" -b {0}k ", conversionOptions.VideoBitRate);
 
-            // Video frame rate
-            if (conversionOptions.VideoFps != null)
-                commandBuilder.AppendFormat(" -r {0} ", conversionOptions.VideoFps);
+            // AudioChannel
+            if (conversionOptions.AudioChannel != null)
+                commandBuilder.AppendFormat(" -ac {0} ", conversionOptions.AudioChannel);
 
             // Video size / resolution
             commandBuilder = AppendVideoSize(commandBuilder, conversionOptions);
