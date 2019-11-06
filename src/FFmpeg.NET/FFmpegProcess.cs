@@ -98,7 +98,7 @@ namespace FFmpeg.NET
 
                 if (RegexEngine.IsProgressData(e.Data, out var progressData))
                 {
-                    progressData.TotalDuration = totalMediaDuration;
+                    progressData.TotalDuration = parameters.InputFile.MetaData?.Duration ?? totalMediaDuration;
                     OnProgressChanged(new ConversionProgressEventArgs(progressData, parameters.InputFile, parameters.OutputFile));
                 }
             }
