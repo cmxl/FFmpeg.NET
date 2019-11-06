@@ -41,6 +41,7 @@ namespace FFmpeg.NET.Extensions
             process.EnableRaisingEvents = true;
             process.Exited += (sender, e) =>
             {
+                process.WaitForExit();
                 if (process.ExitCode != 0)
                     onException?.Invoke(process.ExitCode);
                 tcs.TrySetResult(process.ExitCode);
