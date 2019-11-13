@@ -102,6 +102,7 @@ namespace FFmpeg.NET.Tests
             // Test for this case using -f segment option.
             // Concatenate two copies of the sample audio file together to make sure the input is long enough
             // to generate progress messages. Split the result into 20 second segments. 
+
             string fn = $"-i \"{_fixture.AudioFile.FileInfo.FullName}\"";
             string options = $"{fn} {fn} -filter_complex \"[0:0][1:0]concat=n=2:v=0:a=1[out]\" -map \"[out]\" -f segment -segment_time 20 Split%1d.mp3";
 
@@ -114,6 +115,50 @@ namespace FFmpeg.NET.Tests
             File.Delete("Split0.mp3");
             File.Delete("Split1.mp3");
             File.Delete("Split2.mp3");
+        }
+
+        [Fact]
+        public async Task FFmpeg_Raises_ProgressEvent()
+        {
+            var output = new MediaFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.mp4")));
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
+
+            var e = await Assert.RaisesAsync<ConversionProgressEventArgs>(
+                x => ffmpeg.Progress += x,
+                x => ffmpeg.Progress -= x,
+                async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output)
+            );
+
+            Assert.True(File.Exists(output.FileInfo.FullName));
+            output.FileInfo.Delete();
+            Assert.False(File.Exists(output.FileInfo.FullName));
+
+            Assert.NotNull(e);
+            Assert.Equal(e.Sender, ffmpeg);
+            Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.FileInfo.FullName);
+            Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.FileInfo.FullName);
+        }
+
+        [Fact]
+        public async Task FFmpeg_Raises_DataEvent()
+        {
+            var output = new MediaFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.mp4")));
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
+
+            var e = await Assert.RaisesAsync<ConversionDataEventArgs>(
+                x => ffmpeg.Data += x,
+                x => ffmpeg.Data -= x,
+                async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output)
+            );
+
+            Assert.True(File.Exists(output.FileInfo.FullName));
+            output.FileInfo.Delete();
+            Assert.False(File.Exists(output.FileInfo.FullName));
+
+            Assert.NotNull(e);
+            Assert.Equal(e.Sender, ffmpeg);
+            Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.FileInfo.FullName);
+            Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.FileInfo.FullName);
         }
     }
 }
