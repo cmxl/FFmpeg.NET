@@ -2,7 +2,7 @@ version: 3.4.0
 
 environment:
   nuget_token:
-      secure: 3Eg+MTP6X6DXGbAEsZh7O/rbwemKH/Wvg7ekZ/liLlRTB2nD01fdpgehUUWHX9Vg
+      secure: uOmY35KbgtkniOaosUIGJgx8iV3sQB/Q2JqYxvroymNJCwF21ml28UyFUdoz0jNg
 
 branches:
   only:
