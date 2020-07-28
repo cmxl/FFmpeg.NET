@@ -52,6 +52,11 @@ namespace FFmpeg.NET
         public int? VideoFps { get; set; } = null;
 
         /// <summary>
+        ///     Pixel format. Available formats can be gathered via `ffmpeg -pix_fmts`.
+        /// </summary>
+        public string PixelFormat { get; set; } = null;
+
+        /// <summary>
         ///     Video sizes
         /// </summary>
         public VideoSize VideoSize { get; set; } = VideoSize.Default;

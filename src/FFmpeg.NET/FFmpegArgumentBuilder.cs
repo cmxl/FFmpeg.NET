@@ -101,6 +101,10 @@ namespace FFmpeg.NET
             if (conversionOptions.VideoFps != null)
                 commandBuilder.AppendFormat(" -r {0} ", conversionOptions.VideoFps);
 
+            // Video pixel format
+            if (conversionOptions.PixelFormat != null)
+                commandBuilder.AppendFormat(" -pix_fmt {0} ", conversionOptions.PixelFormat);
+
             // Video size / resolution
             commandBuilder = AppendVideoSize(commandBuilder, conversionOptions);
 
