@@ -110,6 +110,10 @@ namespace FFmpeg.NET
             // Video cropping
             commandBuilder = AppendVideoCropping(commandBuilder, conversionOptions);
 
+            // Extra arguments
+            if (conversionOptions.ExtraArguments != null)
+                commandBuilder.AppendFormat(" {0} ", conversionOptions.ExtraArguments);
+
             if (conversionOptions.BaselineProfile)
                 commandBuilder.Append(" -profile:v baseline ");
 

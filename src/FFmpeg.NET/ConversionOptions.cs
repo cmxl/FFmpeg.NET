@@ -67,6 +67,11 @@ namespace FFmpeg.NET
         public int? CustomHeight { get; set; }
 
         /// <summary>
+        ///     Extra Arguments, such as  -movflags +faststart. Can be used to support missing features temporary
+        /// </summary>
+        public string ExtraArguments { get; set; }
+
+        /// <summary>
         ///     Specifies an optional rectangle from the source video to crop
         /// </summary>
         public CropRectangle SourceCrop { get; set; }
