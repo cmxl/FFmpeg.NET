@@ -1,10 +1,7 @@
-﻿using FFmpeg.NET.Services;
-using FFmpeg.NET.Tests.Fixtures;
+﻿using FFmpeg.NET.Extensions;
 using System;
 using System.IO;
 using System.Linq;
-using FFmpeg.NET.Extensions;
-using Microsoft.DotNet.PlatformAbstractions;
 using Xunit;
 
 namespace FFmpeg.NET.Tests
@@ -110,7 +107,7 @@ namespace FFmpeg.NET.Tests
 
         private static string GetTestFolder()
         {
-            var startupPath = ApplicationEnvironment.ApplicationBasePath;
+            var startupPath = AppContext.BaseDirectory;
             var pathItems = startupPath.Split(Path.DirectorySeparatorChar);
             var pos = pathItems.Reverse().ToList().FindIndex(x => string.Equals("bin", x));
             var projectPath = string.Join(Path.DirectorySeparatorChar.ToString(), pathItems.Take(pathItems.Length - pos - 1));
