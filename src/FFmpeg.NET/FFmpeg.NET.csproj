@@ -12,17 +12,22 @@
     <RepositoryUrl>https://github.com/cmxl/FFmpeg.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ffmpeg, dotnet, net5</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/cmxl/FFmpeg.NET/master/lib/ffmpeg/v4/icon.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
     <Description>.NET wrapper for common ffmpeg tasks.</Description>
     <PackageId>xFFmpeg.NET</PackageId>
-    <Version>5.0.0</Version>
-    <PackageLicenseUrl>https://github.com/cmxl/FFmpeg.NET/blob/master/LICENSE.md</PackageLicenseUrl>
-    <AssemblyVersion>5.0.0</AssemblyVersion>
-    <FileVersion>5.0.0</FileVersion>
+    <Version>5.0.1</Version>
+    <PackageLicense>LICENSE.md</PackageLicense>
+    <AssemblyVersion>5.0.1</AssemblyVersion>
+    <FileVersion>5.0.1</FileVersion>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Resources\icon.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">
