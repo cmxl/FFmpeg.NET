@@ -5,10 +5,40 @@ namespace FFmpeg.NET
 {
     public class ConversionOptions
     {
+
+        /// <summary>
+        ///     Hide Banner
+        /// </summary>
+        public bool HideBanner { get; set; } = false;
+
+        /// <summary>
+        ///     Set the number of threads to be used, in case the selected codec implementation supports multi-threading.
+        ///     Possible values:
+        ///         - 0 - automatically select the number of threads to set
+        ///         - integer to max of cpu cores
+        ///     Default value is ‘0’.
+        /// </summary>
+        public int Threads { get; set; } = 0;
+
+        /// <summary>
+        ///     Hadware Acceleration
+        /// </summary>
+        public HWAccel HWAccel { get; set; } = HWAccel.None;
+
+        /// <summary>
+        ///     Hardware Acceleration Output Format - Force HWAccel if selected
+        /// </summary>
+        public bool HWAccelOutputFormatCopy { get; set; } = true;
+
         /// <summary>
         ///     Audio bit rate
         /// </summary>
         public int? AudioBitRate { get; set; } = null;
+
+        /// <summary>
+        ///     Remove Audio
+        /// </summary>
+        public bool RemoveAudio { get; set; } = false;
 
         /// <summary>
         ///     Audio sample rate
@@ -45,6 +75,11 @@ namespace FFmpeg.NET
         ///     Video bit rate in kbit/s
         /// </summary>
         public int? VideoBitRate { get; set; } = null;
+        
+         /// <summary>
+        ///     Chanel audio
+        /// </summary>
+        public int? AudioChanel { get; set; } = null;
 
         /// <summary>
         ///     Video frame rate
@@ -62,6 +97,39 @@ namespace FFmpeg.NET
         public VideoSize VideoSize { get; set; } = VideoSize.Default;
 
         /// <summary>
+        ///     Video sizes
+        /// </summary>
+        public VideoCodec VideoCodec { get; set; } = VideoCodec.Default;
+
+        /// <summary>
+        ///     Codec Preset (Tested for -vcodec libx264)
+        /// </summary>
+        public VideoCodecPreset VideoCodecPreset { get; set; } = VideoCodecPreset.Default;
+
+        /// <summary>
+        ///     Codec Profile (Tested for -vcodec libx264)
+        ///     Specifies wheter or not to use a H.264 Profile
+        /// </summary>
+        public VideoCodecProfile VideoCodecProfile { get; set; } = VideoCodecProfile.Default;
+
+        /// <summary>
+        ///     Video sizes
+        /// </summary>
+        public VideoFormat VideoFormat { get; set; } = VideoFormat.Default;
+
+        /// <summary>
+        ///     Video Speed Up / Down using setpts filter
+        /// </summary>
+        private double? videoTimeScale = null;
+        public double? VideoTimeScale { get => videoTimeScale; set => videoTimeScale = (value > 0) ? value : 1; }
+
+        /// <summary>
+        ///     Map Metadata from INput to Output
+        /// </summary>
+        public bool MapMetadata { get; set; } = true;
+
+
+        /// <summary>
         ///     Custom Width when VideoSize.Custom is set
         /// </summary>
         public int? CustomWidth { get; set; }
@@ -75,11 +143,6 @@ namespace FFmpeg.NET
         ///     Specifies an optional rectangle from the source video to crop
         /// </summary>
         public CropRectangle SourceCrop { get; set; }
-
-        /// <summary>
-        ///     Specifies wheter or not to use H.264 Baseline Profile
-        /// </summary>
-        public bool BaselineProfile { get; set; }
 
         /// <summary>
         ///     <para> --- </para>
