@@ -14,7 +14,7 @@ You need to provide the ffmpeg executable path to the `Engine` constructor.
 
 | Service | Status |
 | --- | --- |
-| AppVeyor | [![Build status](https://ci.appveyor.com/api/projects/status/lelhr75harlrqt75/branch/master?svg=true)](https://ci.appveyor.com/project/cmxl/ffmpeg-net/branch/master) |
+| Travis CI | [![Build Status](https://travis-ci.com/cmxl/FFmpeg.NET.svg?branch=master)](https://travis-ci.com/cmxl/FFmpeg.NET) |
 
 ## Packages
 
