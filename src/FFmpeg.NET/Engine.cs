@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FFmpeg.NET.Extensions;
 
 namespace FFmpeg.NET
 {
@@ -9,9 +10,16 @@ namespace FFmpeg.NET
     {
         private readonly string _ffmpegPath;
 
-        public Engine(string ffmpegPath)
+        /// <summary>
+        /// Instantiate the FFmpeg engine by providing either the name of the executable or the path to the executable. If only file name is provided, it must be found through the PATH variables.
+        /// </summary>
+        /// <param name="ffmpegPath">The path to the ffmpeg executable, or the executable if it is defined in PATH. If left empty, it will try to find "ffmpeg.exe" from PATH.</param>
+        public Engine(string ffmpegPath = null)
         {
-            _ffmpegPath = ffmpegPath ?? throw new ArgumentNullException(ffmpegPath, "FFmpeg executable path needs to be provided.");
+            ffmpegPath = ffmpegPath ?? "ffmpeg.exe";
+
+            if (!ffmpegPath.TryGetFullPath(out _ffmpegPath))
+                throw new ArgumentException(ffmpegPath, "FFmpeg executable could not be found neither in PATH nor in directory.");
         }
 
         public event EventHandler<ConversionProgressEventArgs> Progress;
