@@ -1,11 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-  
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-	
-	
-	<AssemblyName>FFmpeg.NET</AssemblyName>
+    <TargetFramework>net5</TargetFramework>
+    <AssemblyName>FFmpeg.NET</AssemblyName>
     <RootNamespace>FFmpeg.NET</RootNamespace>
     <Authors>Tobias Haimerl (cmxl)</Authors>
     <Company></Company>
@@ -22,7 +19,6 @@
     <PackageLicenseUrl>https://github.com/cmxl/FFmpeg.NET/blob/master/LICENSE.md</PackageLicenseUrl>
     <AssemblyVersion>2.0.0</AssemblyVersion>
     <FileVersion>2.0.0</FileVersion>
-    <LangVersion>7.3</LangVersion>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
