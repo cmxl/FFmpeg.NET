@@ -125,6 +125,8 @@ namespace FFmpeg.NET
             if (conversionOptions.VideoFps != null)
                 commandBuilder.AppendFormat(" -r {0} ", conversionOptions.VideoFps);
 
+           
+
             // Video size / resolution
             commandBuilder = AppendVideoSize(commandBuilder, conversionOptions);
 
@@ -142,6 +144,10 @@ namespace FFmpeg.NET
             // Audio sample rate
             if (conversionOptions.AudioSampleRate != AudioSampleRate.Default)
                 commandBuilder.AppendFormat(" -ar {0} ", conversionOptions.AudioSampleRate.ToString().Replace("Hz", ""));
+
+            // AudioChannel
+            if (conversionOptions.AudioChanel != null)
+                commandBuilder.AppendFormat(" -ac {0} ", conversionOptions.AudioChanel);
 
             // Remove Audio
             if (conversionOptions.RemoveAudio)
