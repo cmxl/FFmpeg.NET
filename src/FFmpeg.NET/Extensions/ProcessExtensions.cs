@@ -9,10 +9,13 @@ namespace FFmpeg.NET.Extensions
     {
         public static Task<int> WaitForExitAsync(this Process process, Action<int> onException, CancellationToken cancellationToken = default)
         {
+            CancellationTokenRegistration ctRegistration = new CancellationTokenRegistration();
+            bool mustUnregister = false;
             TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
             if (cancellationToken != default)
             {
-                cancellationToken.Register(() =>
+                mustUnregister = true;
+                ctRegistration = cancellationToken.Register(() =>
                 {
                     try
                     {
@@ -38,14 +41,18 @@ namespace FFmpeg.NET.Extensions
                 });
             }
 
-            process.EnableRaisingEvents = true;
-            process.Exited += (sender, e) =>
+            void processOnExited(object sender, EventArgs e)
             {
                 process.WaitForExit();
                 if (process.ExitCode != 0)
                     onException?.Invoke(process.ExitCode);
                 tcs.TrySetResult(process.ExitCode);
-            };
+                if (mustUnregister) ctRegistration.Dispose();
+                process.Exited -= processOnExited;
+            }
+
+            process.EnableRaisingEvents = true;
+            process.Exited += processOnExited;
 
             var started = process.Start();
             if (!started)
