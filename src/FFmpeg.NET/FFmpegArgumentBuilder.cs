@@ -5,9 +5,9 @@ using System.Text;
 
 namespace FFmpeg.NET
 {
-    internal class FFmpegArgumentBuilder
+    internal static class FFmpegArgumentBuilder
     {
-        public string Build(FFmpegParameters parameters)
+        public static string Build(FFmpegParameters parameters)
         {
             if (parameters.HasCustomArguments)
                 return parameters.CustomArguments;
@@ -59,6 +59,20 @@ namespace FFmpeg.NET
             if (conversionOptions == null)
                 return commandBuilder.AppendFormat(" -i \"{0}\" \"{1}\" ", inputFile.FileInfo.FullName, outputFile.FileInfo.FullName).ToString();
 
+            if (conversionOptions.HideBanner) commandBuilder.Append(" -hide_banner ");
+
+            if (conversionOptions.Threads != 0)
+            {
+                commandBuilder.AppendFormat(" -threads {0} ", conversionOptions.Threads);
+            }
+
+            // HW Accel
+            if (conversionOptions.HWAccel != HWAccel.None)
+            {
+                commandBuilder.AppendFormat(" -hwaccel {0} ", conversionOptions.HWAccel);
+                AppendHWAccelOutputFormat(commandBuilder, conversionOptions);
+            }
+
             // Media seek position
             if (conversionOptions.Seek != null)
                 commandBuilder.AppendFormat(CultureInfo.InvariantCulture, " -ss {0} ", conversionOptions.Seek.Value.TotalSeconds);
@@ -81,13 +95,23 @@ namespace FFmpeg.NET
                 return commandBuilder.ToString();
             }
 
-            // Audio bit rate
-            if (conversionOptions.AudioBitRate != null)
-                commandBuilder.AppendFormat(" -ab {0}k", conversionOptions.AudioBitRate);
+            // Video Format
+            commandBuilder = AppendVideoFormat(commandBuilder, conversionOptions);
 
-            // Audio sample rate
-            if (conversionOptions.AudioSampleRate != AudioSampleRate.Default)
-                commandBuilder.AppendFormat(" -ar {0} ", conversionOptions.AudioSampleRate.ToString().Replace("Hz", ""));
+            // Video Codec
+            commandBuilder = AppendVideoCodec(commandBuilder, conversionOptions);
+
+            // Video Codec Preset
+            if (conversionOptions.VideoCodecPreset != VideoCodecPreset.Default)
+                commandBuilder.AppendFormat(" -preset {0} ", conversionOptions.VideoCodecPreset);
+
+            // Video Codec Profile
+            if (conversionOptions.VideoCodecProfile != VideoCodecProfile.Default)
+                commandBuilder.AppendFormat(" -profile:v {0} ", conversionOptions.VideoCodecProfile);
+
+            // Video Time Scale
+            if (conversionOptions.VideoTimeScale != null && conversionOptions.VideoTimeScale != 1)
+                commandBuilder.AppendFormat(" -filter:v \"setpts = {0} * PTS\" ", conversionOptions.VideoTimeScale.ToString().Replace(",","."));
 
             // Maximum video duration
             if (conversionOptions.MaxVideoDuration != null)
@@ -95,7 +119,7 @@ namespace FFmpeg.NET
 
             // Video bit rate
             if (conversionOptions.VideoBitRate != null)
-                commandBuilder.AppendFormat(" -b {0}k ", conversionOptions.VideoBitRate);
+                commandBuilder.AppendFormat(" -b:v {0}k ", conversionOptions.VideoBitRate);
 
             // Video frame rate
             if (conversionOptions.VideoFps != null)
@@ -109,11 +133,48 @@ namespace FFmpeg.NET
 
             // Video cropping
             commandBuilder = AppendVideoCropping(commandBuilder, conversionOptions);
+            
+            #region Audio
+            // Audio bit rate
+            if (conversionOptions.AudioBitRate != null)
+                commandBuilder.AppendFormat(" -ab {0}k", conversionOptions.AudioBitRate);
 
-            if (conversionOptions.BaselineProfile)
-                commandBuilder.Append(" -profile:v baseline ");
+            // Audio sample rate
+            if (conversionOptions.AudioSampleRate != AudioSampleRate.Default)
+                commandBuilder.AppendFormat(" -ar {0} ", conversionOptions.AudioSampleRate.ToString().Replace("Hz", ""));
+
+            // Remove Audio
+            if (conversionOptions.RemoveAudio)
+                commandBuilder.Append(" -an ");
+            #endregion
+
+            if (conversionOptions.MapMetadata) commandBuilder.Append(" -map_metadata 0 ");
+
 
             return commandBuilder.AppendFormat(" \"{0}\" ", outputFile.FileInfo.FullName).ToString();
+        }
+
+        private static void AppendHWAccelOutputFormat(StringBuilder commandBuilder, ConversionOptions conversionOptions)
+        {
+            if(conversionOptions.HWAccel != HWAccel.None && conversionOptions.HWAccelOutputFormatCopy)
+            {
+                HWAccel accel = conversionOptions.HWAccel;
+                bool add = false;
+                switch (conversionOptions.HWAccel)
+                {
+                    case HWAccel.cuda:
+                    case HWAccel.cuvid:
+                        add = true;
+                        accel = HWAccel.cuda;
+                        break;
+                    case HWAccel.dxva2:     //Not tested
+                    case HWAccel.qsv:       //Not tested
+                    case HWAccel.d3d11va:   //Not tested
+                    default:
+                        break;
+                }
+                if(add) commandBuilder.AppendFormat(" -hwaccel_output_format {0} ", accel);
+            }
         }
 
         private static StringBuilder AppendVideoCropping(StringBuilder commandBuilder, ConversionOptions conversionOptions)
@@ -154,6 +215,30 @@ namespace FFmpeg.NET
                     size = size.Replace("_", "-");
 
                 commandBuilder.AppendFormat(" -s {0} ", size);
+            }
+            return commandBuilder;
+        }
+
+
+        private static StringBuilder AppendVideoCodec(StringBuilder commandBuilder, ConversionOptions conversionOptions)
+        {
+            if (conversionOptions.VideoCodec != VideoCodec.Default)
+            {
+                var codec = conversionOptions.VideoCodec.ToString().ToLowerInvariant();
+                commandBuilder.AppendFormat(" -vcodec {0} ", codec);
+            }
+            return commandBuilder;
+        }
+
+        private static StringBuilder AppendVideoFormat(StringBuilder commandBuilder, ConversionOptions conversionOptions)
+        {
+            if (conversionOptions.VideoFormat != VideoFormat.Default)
+            {
+                var format = conversionOptions.VideoFormat.ToString().ToLowerInvariant();
+                if (format.StartsWith("_"))
+                    format = format.Replace("_", "");
+
+                commandBuilder.AppendFormat(" -f {0} ", format);
             }
             return commandBuilder;
         }

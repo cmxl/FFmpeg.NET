@@ -75,12 +75,18 @@ namespace FFmpeg.NET
 
         private async Task ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken = default)
         {
-            var ffmpegProcess = new FFmpegProcess();
+            var ffmpegProcess = new FFmpegProcess(parameters, _ffmpegPath, cancellationToken);
             ffmpegProcess.Progress += OnProgress;
             ffmpegProcess.Completed += OnComplete;
             ffmpegProcess.Error += OnError;
             ffmpegProcess.Data += OnData;
-            await ffmpegProcess.ExecuteAsync(parameters, _ffmpegPath, cancellationToken);
+            await ffmpegProcess.ExecuteAsync();
+
+            ffmpegProcess.Progress -= OnProgress;
+            ffmpegProcess.Completed -= OnComplete;
+            ffmpegProcess.Error -= OnError;
+            ffmpegProcess.Data -= OnData;
+
         }
 
         public async Task ExecuteAsync(string arguments, CancellationToken cancellationToken = default)
@@ -96,5 +102,6 @@ namespace FFmpeg.NET
         private void OnComplete(ConversionCompleteEventArgs e) => Complete?.Invoke(this, e);
 
         private void OnData(ConversionDataEventArgs e) => Data?.Invoke(this, e);
+
     }
 }
