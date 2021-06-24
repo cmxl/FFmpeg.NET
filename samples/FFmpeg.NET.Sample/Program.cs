@@ -1,4 +1,4 @@
-﻿using FFmpeg.NET.Enums;
+using FFmpeg.NET.Enums;
 using FFmpeg.NET.Events;
 using System;
 using System.Threading.Tasks;
@@ -23,15 +23,15 @@ namespace FFmpeg.NET.Sample
                 ffmpeg.Data += OnData;
                 ffmpeg.Error += OnError;
                 ffmpeg.Complete += OnComplete;
-                var output = await ffmpeg.ConvertAsync(inputFile, outputFile);
+                var output = await ffmpeg.ConvertAsync(inputFile, outputFile).ConfigureAwait(false);
                 var thumbNail = await ffmpeg.GetThumbnailAsync(output, thumbNailFile,
                     new ConversionOptions
                     {
                         Seek = TimeSpan.FromSeconds(3),
                         VideoSize = Enums.VideoSize.Custom,
                         SourceCrop = new CropRectangle { X = 100, Width = 200, Y = 100, Height = 100 }
-                    });
-                var metadata = await ffmpeg.GetMetaDataAsync(output);
+                    }).ConfigureAwait(false);
+                var metadata = await ffmpeg.GetMetaDataAsync(output).ConfigureAwait(false);
                 Console.WriteLine(metadata.FileInfo.FullName);
                 Console.WriteLine(metadata);
             }

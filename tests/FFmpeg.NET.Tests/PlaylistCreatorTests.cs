@@ -1,4 +1,4 @@
-﻿using FFmpeg.NET.Services;
+using FFmpeg.NET.Services;
 using FFmpeg.NET.Tests.Fixtures;
 using System;
 using System.Diagnostics;
@@ -25,8 +25,8 @@ namespace FFmpeg.NET.Tests
         public async Task M3uPlaylistCreator_Creates_Valid_m3u8_Content()
         {
             var ffmpeg = new Engine(_fixture.FFmpegPath);
-            var meta1 = await ffmpeg.GetMetaDataAsync(_fixture.VideoFile);
-            var meta2 = await ffmpeg.GetMetaDataAsync(_fixture.AudioFile);
+            var meta1 = await ffmpeg.GetMetaDataAsync(_fixture.VideoFile).ConfigureAwait(false);
+            var meta2 = await ffmpeg.GetMetaDataAsync(_fixture.AudioFile).ConfigureAwait(false);
             
             _output.WriteLine(meta1?.ToString() ?? "-- KEIN META ! --");
             _output.WriteLine(meta2?.ToString());
@@ -53,8 +53,8 @@ namespace FFmpeg.NET.Tests
         public async Task XspfPlaylistCreator_Creates_Valid_Xml()
         {
             var ffmpeg = new Engine(_fixture.FFmpegPath);
-            var meta1 = await ffmpeg.GetMetaDataAsync(_fixture.VideoFile);
-            var meta2 = await ffmpeg.GetMetaDataAsync(_fixture.AudioFile);
+            var meta1 = await ffmpeg.GetMetaDataAsync(_fixture.VideoFile).ConfigureAwait(false);
+            var meta2 = await ffmpeg.GetMetaDataAsync(_fixture.AudioFile).ConfigureAwait(false);
 
             Assert.NotNull(meta1);
             Assert.NotNull(meta2);
