@@ -1,4 +1,4 @@
-﻿using FFmpeg.NET.Events;
+using FFmpeg.NET.Events;
 using FFmpeg.NET.Extensions;
 using System;
 using System.IO;
@@ -39,12 +39,12 @@ namespace FFmpeg.NET
                 Input = mediaFile
             };
 
-            await ExecuteAsync(parameters, cancellationToken);
+            await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
             return mediaFile.MetaData;
         }
 
         public async Task<MediaFile> GetThumbnailAsync(InputFile input, OutputFile output, CancellationToken cancellationToken = default)
-            => await GetThumbnailAsync(input, output, default, cancellationToken);
+            => await GetThumbnailAsync(input, output, default, cancellationToken).ConfigureAwait(false);
 
         public async Task<MediaFile> GetThumbnailAsync(InputFile input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken = default)
         {
@@ -56,12 +56,12 @@ namespace FFmpeg.NET
                 ConversionOptions = options
             };
 
-            await ExecuteAsync(parameters, cancellationToken);
+            await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
             return output;
         }
 
         public async Task<MediaFile> ConvertAsync(InputFile input, OutputFile output, CancellationToken cancellationToken = default)
-            => await ConvertAsync(input, output, default, cancellationToken);
+            => await ConvertAsync(input, output, default, cancellationToken).ConfigureAwait(false);
 
         public async Task<MediaFile> ConvertAsync(InputFile input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken = default)
         {
@@ -73,14 +73,14 @@ namespace FFmpeg.NET
                 ConversionOptions = options
             };
 
-            await ExecuteAsync(parameters, cancellationToken);
+            await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
             return output;
         }
 
         public async Task<Stream> ConvertAsync(IInputArgument input, ConversionOptions options, CancellationToken cancellationToken)
         {
             var ms = new MemoryStream();
-            await ConvertAsync(input, ms, options, cancellationToken);
+            await ConvertAsync(input, ms, options, cancellationToken).ConfigureAwait(false);
             ms.Position = 0;
             return ms;
         }
@@ -109,20 +109,20 @@ namespace FFmpeg.NET
                     pipe.Disconnect();
                     pipe.Dispose();
                 })
-            );
+            ).ConfigureAwait(false);
         }
 
         private async Task ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken)
         {
             var ffmpegProcess = CreateProcess(parameters, cancellationToken);
-            await ffmpegProcess.ExecuteAsync();
+            await ffmpegProcess.ExecuteAsync().ConfigureAwait(false);
             Cleanup(ffmpegProcess);
         }
 
         public async Task ExecuteAsync(string arguments, CancellationToken cancellationToken)
         {
             var parameters = new FFmpegParameters { CustomArguments = arguments };
-            await ExecuteAsync(parameters, cancellationToken);
+            await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
         }
 
         private FFmpegProcess CreateProcess(FFmpegParameters parameters, CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using FFmpeg.NET.Events;
@@ -27,14 +27,14 @@ namespace FFmpeg.NET.Tests
         {
             Engine ffmpeg = new Engine(_fixture.FFmpegPath);
 
-            await MetaDataTests.CreateLongAudioFile(ffmpeg, _fixture.AudioFile);
+            await MetaDataTests.CreateLongAudioFile(ffmpeg, _fixture.AudioFile).ConfigureAwait(false);
 
             FileInfo audioFileInfo = new FileInfo("LongAudio.mp3");
             InputFile audioFile = new InputFile(audioFileInfo);
             ffmpeg.Progress += Ffmpeg_Progress;
 
             OutputFile output = new OutputFile("LongAudio.aif");
-            await ffmpeg.ConvertAsync(audioFile, output);
+            await ffmpeg.ConvertAsync(audioFile, output).ConfigureAwait(false);
 
             ffmpeg.Progress -= Ffmpeg_Progress;
             output.FileInfo.Delete();
@@ -58,7 +58,7 @@ namespace FFmpeg.NET.Tests
                 x => ffmpeg.Complete += x,
                 x => ffmpeg.Complete -= x,
                 async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output)
-            );
+            ).ConfigureAwait(false);
             
             Assert.True(File.Exists(output.FileInfo.FullName));
             output.FileInfo.Delete();
@@ -80,7 +80,8 @@ namespace FFmpeg.NET.Tests
             var e = await Assert.RaisesAsync<ConversionErrorEventArgs>(
                 x => ffmpeg.Error += x,
                 x => ffmpeg.Error -= x,
-                async () => await ffmpeg.ConvertAsync(input, output));
+                async () => await ffmpeg.ConvertAsync(input, output))
+                .ConfigureAwait(false);
 
             Assert.NotNull(e);
             Assert.Equal(e.Sender, ffmpeg);
@@ -110,7 +111,7 @@ namespace FFmpeg.NET.Tests
                 x => ffmpeg.Progress += x,
                 x => ffmpeg.Progress -= x,
                 async () => await ffmpeg.ExecuteAsync(options, default)
-            );
+            ).ConfigureAwait(false);
 
             File.Delete("Split0.mp3");
             File.Delete("Split1.mp3");
@@ -127,7 +128,7 @@ namespace FFmpeg.NET.Tests
                 x => ffmpeg.Progress += x,
                 x => ffmpeg.Progress -= x,
                 async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output)
-            );
+            ).ConfigureAwait(false);
 
             Assert.True(File.Exists(output.FileInfo.FullName));
             output.FileInfo.Delete();
@@ -149,7 +150,7 @@ namespace FFmpeg.NET.Tests
                 x => ffmpeg.Data += x,
                 x => ffmpeg.Data -= x,
                 async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output)
-            );
+            ).ConfigureAwait(false);
 
             Assert.True(File.Exists(output.FileInfo.FullName));
             output.FileInfo.Delete();

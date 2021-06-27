@@ -36,23 +36,24 @@ namespace FFmpeg.NET.Tests
             MediaFile temp4 = new MediaFile("Long4.mp3");
 
             string p = $"-i \"{inputFile.FileInfo.FullName}\" -ar 8K -q:a 9 -ac 1 -f mp3 -y \"{temp1.FileInfo.FullName}\"";
-            await ffmpeg.ExecuteAsync(p, default);
+
+            await ffmpeg.ExecuteAsync(p, default).ConfigureAwait(false);
 
             string fn = $"{temp1.FileInfo.Name}";
             p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{temp2.FileInfo.Name}\"";
-            await ffmpeg.ExecuteAsync(p, default);
+            await ffmpeg.ExecuteAsync(p, default).ConfigureAwait(false);
 
             fn = $"{temp2.FileInfo.Name}";
             p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{temp3.FileInfo.Name}\"";
-            await ffmpeg.ExecuteAsync(p, default);
+            await ffmpeg.ExecuteAsync(p, default).ConfigureAwait(false);
 
             fn = $"{temp3.FileInfo.Name}";
             p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{temp4.FileInfo.Name}\"";
-            await ffmpeg.ExecuteAsync(p, default);
+            await ffmpeg.ExecuteAsync(p, default).ConfigureAwait(false);
 
             fn = $"{temp4.FileInfo.Name}";
             p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{output.FileInfo.Name}\"";
-            await ffmpeg.ExecuteAsync(p, default);
+            await ffmpeg.ExecuteAsync(p, default).ConfigureAwait(false);
 
             temp1.FileInfo.Delete();
             temp2.FileInfo.Delete();
@@ -64,9 +65,9 @@ namespace FFmpeg.NET.Tests
         public async Task FFmpeg_Can_Read_Audio_Metadata()
         {
             var ffmpeg = new Engine(_fixture.FFmpegPath);
-            ffmpeg.Data += (s, e) => _output.WriteLine(e?.Data ?? "-");
+
             var audioFile = _fixture.AudioFile;
-            var metaData = await ffmpeg.GetMetaDataAsync(audioFile);
+            var metaData = await ffmpeg.GetMetaDataAsync(audioFile).ConfigureAwait(false);
 
             Assert.NotNull(metaData);
 
@@ -87,7 +88,7 @@ namespace FFmpeg.NET.Tests
             var ffmpeg = new Engine(_fixture.FFmpegPath);
 
             var videoFile = _fixture.VideoFile;
-            var metaData = await ffmpeg.GetMetaDataAsync(videoFile);
+            var metaData = await ffmpeg.GetMetaDataAsync(videoFile).ConfigureAwait(false);
 
             Assert.NotNull(metaData);
             Assert.Equal(metaData.FileInfo, videoFile.FileInfo);
@@ -111,7 +112,7 @@ namespace FFmpeg.NET.Tests
         public async Task CustomParameters()
         {
             var ffmpeg = new Engine(_fixture.FFmpegPath);
-            await ffmpeg.ExecuteAsync($"-i \"{_fixture.VideoFile.FileInfo.FullName}\" -f ffmetadata -", default);
+            await ffmpeg.ExecuteAsync($"-i \"{_fixture.VideoFile.FileInfo.FullName}\" -f ffmetadata -", default).ConfigureAwait(false);
         }
 
         [Fact]
@@ -119,12 +120,12 @@ namespace FFmpeg.NET.Tests
         {
             Engine ffmpeg = new Engine(_fixture.FFmpegPath);
 
-            await CreateLongAudioFile(ffmpeg, _fixture.AudioFile);
+            await CreateLongAudioFile(ffmpeg, _fixture.AudioFile).ConfigureAwait(false);
 
             FileInfo audioFileInfo = new FileInfo("LongAudio.mp3");
             InputFile audioFile = new InputFile(audioFileInfo);
 
-            MetaData metaData = await ffmpeg.GetMetaDataAsync(audioFile);
+            MetaData metaData = await ffmpeg.GetMetaDataAsync(audioFile).ConfigureAwait(false);
 
             Assert.NotNull(metaData);
             Assert.NotNull(metaData.AudioData);

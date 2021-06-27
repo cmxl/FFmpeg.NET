@@ -1,4 +1,4 @@
-﻿using FFmpeg.NET.Events;
+using FFmpeg.NET.Events;
 using FFmpeg.NET.Exceptions;
 using FFmpeg.NET.Extensions;
 using System;
@@ -31,7 +31,7 @@ namespace FFmpeg.NET
             caughtException = null;
             string arguments = FFmpegArgumentBuilder.Build(parameters);
             ProcessStartInfo startInfo = GenerateStartInfo(ffmpegFilePath, arguments);
-            await ExecuteAsync(startInfo, parameters, cancellationToken);
+            await ExecuteAsync(startInfo, parameters, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task ExecuteAsync(ProcessStartInfo startInfo, FFmpegParameters parameters, CancellationToken cancellationToken = default)
@@ -45,7 +45,7 @@ namespace FFmpeg.NET
                 try
                 {
                     task = ffmpegProcess.WaitForExitAsync(null, cancellationToken);
-                    await task;
+                    await task.ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
