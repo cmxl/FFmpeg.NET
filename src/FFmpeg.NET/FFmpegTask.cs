@@ -1,6 +1,6 @@
 ﻿namespace FFmpeg.NET
 {
-    internal enum FFmpegTask
+    public enum FFmpegTask
     {
         Convert,
         GetMetaData,

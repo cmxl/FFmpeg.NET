@@ -1,14 +1,18 @@
 ﻿using FFmpeg.NET.Events;
+using FFmpeg.NET.Extensions;
 using System;
+using System.IO;
+using System.IO.Pipes;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using FFmpeg.NET.Extensions;
 
 namespace FFmpeg.NET
 {
     public sealed class Engine
     {
         private readonly string _ffmpegPath;
+        private readonly string _pipePrefix = "xffmpegnet_";
 
         /// <summary>
         /// Instantiate the FFmpeg engine by providing either the name of the executable or the path to the executable. If only file name is provided, it must be found through the PATH variables.
@@ -27,72 +31,124 @@ namespace FFmpeg.NET
         public event EventHandler<ConversionCompleteEventArgs> Complete;
         public event EventHandler<ConversionDataEventArgs> Data;
 
-        public async Task<MetaData> GetMetaDataAsync(MediaFile mediaFile, CancellationToken cancellationToken = default)
+        public async Task<MetaData> GetMetaDataAsync(InputFile mediaFile, CancellationToken cancellationToken = default)
         {
             var parameters = new FFmpegParameters
             {
                 Task = FFmpegTask.GetMetaData,
-                InputFile = mediaFile
+                Input = mediaFile
             };
 
             await ExecuteAsync(parameters, cancellationToken);
-            return parameters.InputFile.MetaData;
+            return mediaFile.MetaData;
         }
 
-        public async Task<MediaFile> GetThumbnailAsync(MediaFile input, MediaFile output, CancellationToken cancellationToken = default)
+        public async Task<MediaFile> GetThumbnailAsync(InputFile input, OutputFile output, CancellationToken cancellationToken = default)
             => await GetThumbnailAsync(input, output, default, cancellationToken);
 
-        public async Task<MediaFile> GetThumbnailAsync(MediaFile input, MediaFile output, ConversionOptions options, CancellationToken cancellationToken = default)
+        public async Task<MediaFile> GetThumbnailAsync(InputFile input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken = default)
         {
             var parameters = new FFmpegParameters
             {
                 Task = FFmpegTask.GetThumbnail,
-                InputFile = input,
-                OutputFile = output,
+                Input = input,
+                Output = output,
                 ConversionOptions = options
             };
 
             await ExecuteAsync(parameters, cancellationToken);
-            return parameters.OutputFile;
+            return output;
         }
 
-        public async Task<MediaFile> ConvertAsync(MediaFile input, MediaFile output, CancellationToken cancellationToken = default)
+        public async Task<MediaFile> ConvertAsync(InputFile input, OutputFile output, CancellationToken cancellationToken = default)
             => await ConvertAsync(input, output, default, cancellationToken);
 
-        public async Task<MediaFile> ConvertAsync(MediaFile input, MediaFile output, ConversionOptions options, CancellationToken cancellationToken = default)
+        public async Task<MediaFile> ConvertAsync(InputFile input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken = default)
         {
             var parameters = new FFmpegParameters
             {
                 Task = FFmpegTask.Convert,
-                InputFile = input,
-                OutputFile = output,
+                Input = input,
+                Output = output,
                 ConversionOptions = options
             };
 
             await ExecuteAsync(parameters, cancellationToken);
-            return parameters.OutputFile;
+            return output;
         }
 
-        private async Task ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken = default)
+        public async Task<Stream> ConvertAsync(IInputArgument input, ConversionOptions options, CancellationToken cancellationToken)
+        {
+            var ms = new MemoryStream();
+            await ConvertAsync(input, ms, options, cancellationToken);
+            ms.Position = 0;
+            return ms;
+        }
+
+        public async Task ConvertAsync(IInputArgument input, Stream output, ConversionOptions options, CancellationToken cancellationToken)
+        {
+            var pipeName = $"{_pipePrefix}{Guid.NewGuid()}";
+            var parameters = new FFmpegParameters
+            {
+                Task = FFmpegTask.Convert,
+                Input = input,
+                Output = new OutputPipe(GetPipePath(pipeName)),
+                ConversionOptions = options
+            };
+
+            var process = CreateProcess(parameters, cancellationToken);
+            var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+
+            await Task.WhenAll(
+                pipe.WaitForConnectionAsync(cancellationToken).ContinueWith(async x =>
+                {
+                    await pipe.CopyToAsync(output, cancellationToken);
+                }),
+                process.ExecuteAsync().ContinueWith(x =>
+                {
+                    pipe.Disconnect();
+                    pipe.Dispose();
+                })
+            );
+        }
+
+        private async Task ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken)
+        {
+            var ffmpegProcess = CreateProcess(parameters, cancellationToken);
+            await ffmpegProcess.ExecuteAsync();
+            Cleanup(ffmpegProcess);
+        }
+
+        public async Task ExecuteAsync(string arguments, CancellationToken cancellationToken)
+        {
+            var parameters = new FFmpegParameters { CustomArguments = arguments };
+            await ExecuteAsync(parameters, cancellationToken);
+        }
+
+        private FFmpegProcess CreateProcess(FFmpegParameters parameters, CancellationToken cancellationToken)
         {
             var ffmpegProcess = new FFmpegProcess(parameters, _ffmpegPath, cancellationToken);
             ffmpegProcess.Progress += OnProgress;
             ffmpegProcess.Completed += OnComplete;
             ffmpegProcess.Error += OnError;
             ffmpegProcess.Data += OnData;
-            await ffmpegProcess.ExecuteAsync();
+            return ffmpegProcess;
+        }
 
+        private void Cleanup(FFmpegProcess ffmpegProcess)
+        {
             ffmpegProcess.Progress -= OnProgress;
             ffmpegProcess.Completed -= OnComplete;
             ffmpegProcess.Error -= OnError;
             ffmpegProcess.Data -= OnData;
-
         }
 
-        public async Task ExecuteAsync(string arguments, CancellationToken cancellationToken = default)
+        private static string GetPipePath(string pipeName)
         {
-            var parameters = new FFmpegParameters { CustomArguments = arguments };
-            await ExecuteAsync(parameters, cancellationToken);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return $@"\\.\pipe\{pipeName}";
+            else
+                return $"unix:/tmp/CoreFxPipe_{pipeName}";
         }
 
         private void OnProgress(ConversionProgressEventArgs e) => Progress?.Invoke(this, e);

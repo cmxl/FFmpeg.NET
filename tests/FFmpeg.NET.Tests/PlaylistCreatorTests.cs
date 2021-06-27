@@ -29,7 +29,7 @@ namespace FFmpeg.NET.Tests
             var meta2 = await ffmpeg.GetMetaDataAsync(_fixture.AudioFile);
             
             _output.WriteLine(meta1?.ToString() ?? "-- KEIN META ! --");
-            _output.WriteLine(meta2?.ToString());
+            _output.WriteLine(meta2?.ToString() ?? "-- KEIN META ! --");
 
             Assert.NotNull(meta1);
             Assert.NotNull(meta2);

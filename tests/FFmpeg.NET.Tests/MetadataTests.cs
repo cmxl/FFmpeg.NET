@@ -3,17 +3,20 @@ using System.IO;
 using FFmpeg.NET.Tests.Fixtures;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FFmpeg.NET.Tests
 {
     public class MetaDataTests : IClassFixture<MediaFileFixture>
     {
-        public MetaDataTests(MediaFileFixture fixture)
+        public MetaDataTests(MediaFileFixture fixture, ITestOutputHelper output)
         {
             _fixture = fixture;
+            _output = output;
         }
 
         private readonly MediaFileFixture _fixture;
+        private readonly ITestOutputHelper _output;
 
         // Create a 31 hour audio file.
         // Use ffmpeg.exe to copy the audio from SampleAudio_0.4mb.mp3 enough times so that the 
@@ -33,23 +36,23 @@ namespace FFmpeg.NET.Tests
             MediaFile temp4 = new MediaFile("Long4.mp3");
 
             string p = $"-i \"{inputFile.FileInfo.FullName}\" -ar 8K -q:a 9 -ac 1 -f mp3 -y \"{temp1.FileInfo.FullName}\"";
-            await ffmpeg.ExecuteAsync(p);
+            await ffmpeg.ExecuteAsync(p, default);
 
             string fn = $"{temp1.FileInfo.Name}";
             p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{temp2.FileInfo.Name}\"";
-            await ffmpeg.ExecuteAsync(p);
+            await ffmpeg.ExecuteAsync(p, default);
 
             fn = $"{temp2.FileInfo.Name}";
             p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{temp3.FileInfo.Name}\"";
-            await ffmpeg.ExecuteAsync(p);
+            await ffmpeg.ExecuteAsync(p, default);
 
             fn = $"{temp3.FileInfo.Name}";
             p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{temp4.FileInfo.Name}\"";
-            await ffmpeg.ExecuteAsync(p);
+            await ffmpeg.ExecuteAsync(p, default);
 
             fn = $"{temp4.FileInfo.Name}";
             p = $"-i \"concat:{fn}|{fn}|{fn}|{fn}\" -c copy -y \"{output.FileInfo.Name}\"";
-            await ffmpeg.ExecuteAsync(p);
+            await ffmpeg.ExecuteAsync(p, default);
 
             temp1.FileInfo.Delete();
             temp2.FileInfo.Delete();
@@ -61,7 +64,7 @@ namespace FFmpeg.NET.Tests
         public async Task FFmpeg_Can_Read_Audio_Metadata()
         {
             var ffmpeg = new Engine(_fixture.FFmpegPath);
-
+            ffmpeg.Data += (s, e) => _output.WriteLine(e?.Data ?? "-");
             var audioFile = _fixture.AudioFile;
             var metaData = await ffmpeg.GetMetaDataAsync(audioFile);
 
@@ -108,7 +111,7 @@ namespace FFmpeg.NET.Tests
         public async Task CustomParameters()
         {
             var ffmpeg = new Engine(_fixture.FFmpegPath);
-            await ffmpeg.ExecuteAsync($"-i \"{_fixture.VideoFile.FileInfo.FullName}\" -f ffmetadata -");
+            await ffmpeg.ExecuteAsync($"-i \"{_fixture.VideoFile.FileInfo.FullName}\" -f ffmetadata -", default);
         }
 
         [Fact]
@@ -119,7 +122,7 @@ namespace FFmpeg.NET.Tests
             await CreateLongAudioFile(ffmpeg, _fixture.AudioFile);
 
             FileInfo audioFileInfo = new FileInfo("LongAudio.mp3");
-            MediaFile audioFile = new MediaFile(audioFileInfo);
+            InputFile audioFile = new InputFile(audioFileInfo);
 
             MetaData metaData = await ffmpeg.GetMetaDataAsync(audioFile);
 

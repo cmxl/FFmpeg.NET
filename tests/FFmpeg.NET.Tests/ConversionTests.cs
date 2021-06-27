@@ -30,10 +30,10 @@ namespace FFmpeg.NET.Tests
             await MetaDataTests.CreateLongAudioFile(ffmpeg, _fixture.AudioFile);
 
             FileInfo audioFileInfo = new FileInfo("LongAudio.mp3");
-            MediaFile audioFile = new MediaFile(audioFileInfo);
+            InputFile audioFile = new InputFile(audioFileInfo);
             ffmpeg.Progress += Ffmpeg_Progress;
 
-            MediaFile output = new MediaFile("LongAudio.aif");
+            OutputFile output = new OutputFile("LongAudio.aif");
             await ffmpeg.ConvertAsync(audioFile, output);
 
             ffmpeg.Progress -= Ffmpeg_Progress;
@@ -51,7 +51,7 @@ namespace FFmpeg.NET.Tests
         [Fact]
         public async Task FFmpeg_Invokes_ConversionCompleteEvent()
         {
-            var output = new MediaFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.mp4")));
+            var output = new OutputFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.mp4")));
             var ffmpeg = new Engine(_fixture.FFmpegPath);
 
             var e = await Assert.RaisesAsync<ConversionCompleteEventArgs>(
@@ -66,15 +66,15 @@ namespace FFmpeg.NET.Tests
 
             Assert.NotNull(e);
             Assert.Equal(e.Sender, ffmpeg);
-            Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.FileInfo.FullName);
-            Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.FileInfo.FullName);
+            Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.Name);
+            Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.Name);
         }
 
         [Fact]
         public async Task FFmpeg_Should_Throw_Exception_On_Invalid_OutputFile()
         {
             var ffmpeg = new Engine(_fixture.FFmpegPath);
-            var output = new MediaFile("test.txt");
+            var output = new OutputFile("test.txt");
             var input = _fixture.VideoFile;
 
             var e = await Assert.RaisesAsync<ConversionErrorEventArgs>(
@@ -109,7 +109,7 @@ namespace FFmpeg.NET.Tests
             var e = await Assert.RaisesAsync<ConversionProgressEventArgs>(
                 x => ffmpeg.Progress += x,
                 x => ffmpeg.Progress -= x,
-                async () => await ffmpeg.ExecuteAsync(options)
+                async () => await ffmpeg.ExecuteAsync(options, default)
             );
 
             File.Delete("Split0.mp3");
@@ -120,7 +120,7 @@ namespace FFmpeg.NET.Tests
         [Fact]
         public async Task FFmpeg_Raises_ProgressEvent()
         {
-            var output = new MediaFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.mp4")));
+            var output = new OutputFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.mp4")));
             var ffmpeg = new Engine(_fixture.FFmpegPath);
 
             var e = await Assert.RaisesAsync<ConversionProgressEventArgs>(
@@ -135,14 +135,14 @@ namespace FFmpeg.NET.Tests
 
             Assert.NotNull(e);
             Assert.Equal(e.Sender, ffmpeg);
-            Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.FileInfo.FullName);
-            Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.FileInfo.FullName);
+            Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.Name);
+            Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.Name);
         }
 
         [Fact]
         public async Task FFmpeg_Raises_DataEvent()
         {
-            var output = new MediaFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.mp4")));
+            var output = new OutputFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.mp4")));
             var ffmpeg = new Engine(_fixture.FFmpegPath);
 
             var e = await Assert.RaisesAsync<ConversionDataEventArgs>(
@@ -157,8 +157,8 @@ namespace FFmpeg.NET.Tests
 
             Assert.NotNull(e);
             Assert.Equal(e.Sender, ffmpeg);
-            Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.FileInfo.FullName);
-            Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.FileInfo.FullName);
+            Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.Name);
+            Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.Name);
         }
     }
 }

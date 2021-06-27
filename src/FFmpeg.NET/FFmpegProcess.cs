@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FFmpeg.NET
 {
-    internal sealed class FFmpegProcess
+    public sealed class FFmpegProcess
     {
         FFmpegParameters parameters;
         readonly string ffmpegFilePath;
@@ -39,7 +39,7 @@ namespace FFmpeg.NET
             using (Process ffmpegProcess = new Process() { StartInfo = startInfo })
             {
                 ffmpegProcess.ErrorDataReceived += OnDataHandler;
-                
+
 
                 Task<int> task = null;
                 try
@@ -72,14 +72,14 @@ namespace FFmpeg.NET
                 }
                 else
                 {
-                    OnConversionCompleted(new ConversionCompleteEventArgs(parameters.InputFile, parameters.OutputFile));
+                    OnConversionCompleted(new ConversionCompleteEventArgs(parameters.Input, parameters.Output));
                 }
             }
         }
 
         private void OnDataHandler(object sender, DataReceivedEventArgs e)
         {
-            OnData(new ConversionDataEventArgs(e.Data, parameters.InputFile, parameters.OutputFile));
+            OnData(new ConversionDataEventArgs(e.Data, parameters.Input, parameters.Output));
             FFmpegProcessOnErrorDataReceived(e, parameters, ref caughtException, messages);
         }
 
@@ -87,7 +87,7 @@ namespace FFmpeg.NET
         {
             var exceptionMessage = GetExceptionMessage(messages);
             var exception = new FFmpegException(exceptionMessage, caughtException, exitCode);
-            OnConversionError(new ConversionErrorEventArgs(exception, parameters.InputFile, parameters.OutputFile));
+            OnConversionError(new ConversionErrorEventArgs(exception, parameters.Input, parameters.Output));
         }
 
         private string GetExceptionMessage(List<string> messages)
@@ -105,7 +105,7 @@ namespace FFmpeg.NET
             try
             {
                 messages.Insert(0, e.Data);
-                if (parameters.InputFile != null)
+                if (parameters.Input != null)
                 {
                     RegexEngine.TestVideo(e.Data, parameters);
                     RegexEngine.TestAudio(e.Data, parameters);
@@ -113,22 +113,25 @@ namespace FFmpeg.NET
                     var matchDuration = RegexEngine._index[RegexEngine.Find.Duration].Match(e.Data);
                     if (matchDuration.Success)
                     {
-                        if (parameters.InputFile.MetaData == null)
-                            parameters.InputFile.MetaData = new MetaData { FileInfo = parameters.InputFile.FileInfo };
+                        if (parameters.Input is MediaFile input)
+                        {
+                            if (input.MetaData == null)
+                                input.MetaData = new MetaData { FileInfo = input.FileInfo };
 
-                        RegexEngine.TimeSpanLargeTryParse(matchDuration.Groups[1].Value, out totalMediaDuration);
-                        parameters.InputFile.MetaData.Duration = totalMediaDuration;
+                            RegexEngine.TimeSpanLargeTryParse(matchDuration.Groups[1].Value, out totalMediaDuration);
+                            input.MetaData.Duration = totalMediaDuration;
+                        }
                     }
                 }
 
                 if (RegexEngine.IsProgressData(e.Data, out var progressData))
                 {
-                    if (parameters.InputFile != null)
+                    if (parameters.Input != null)
                     {
-                        progressData.TotalDuration = parameters.InputFile.MetaData?.Duration ?? totalMediaDuration;
+                        progressData.TotalDuration = parameters.Input.MetaData?.Duration ?? totalMediaDuration;
                     }
 
-                    OnProgressChanged(new ConversionProgressEventArgs(progressData, parameters.InputFile, parameters.OutputFile));
+                    OnProgressChanged(new ConversionProgressEventArgs(progressData, parameters.Input, parameters.Output));
                 }
             }
             catch (Exception ex)

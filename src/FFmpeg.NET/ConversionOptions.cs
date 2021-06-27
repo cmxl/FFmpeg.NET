@@ -1,5 +1,5 @@
-﻿using System;
-using FFmpeg.NET.Enums;
+﻿using FFmpeg.NET.Enums;
+using System;
 
 namespace FFmpeg.NET
 {
@@ -75,8 +75,8 @@ namespace FFmpeg.NET
         ///     Video bit rate in kbit/s
         /// </summary>
         public int? VideoBitRate { get; set; } = null;
-        
-         /// <summary>
+
+        /// <summary>
         ///     Chanel audio
         /// </summary>
         public int? AudioChanel { get; set; } = null;
@@ -148,6 +148,11 @@ namespace FFmpeg.NET
         ///     Specifies an optional rectangle from the source video to crop
         /// </summary>
         public CropRectangle SourceCrop { get; set; }
+
+        /// <summary>
+        ///     Read with native frame rate. Perfect for streaming.
+        /// </summary>
+        public bool Stream { get; set; }
 
         /// <summary>
         ///     <para> --- </para>
