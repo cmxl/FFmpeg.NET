@@ -4,13 +4,13 @@ namespace FFmpeg.NET.Events
 {
     public class ConversionCompleteEventArgs : EventArgs
     {
-        public ConversionCompleteEventArgs(MediaFile input, MediaFile output)
+        public ConversionCompleteEventArgs(IInputArgument input, IOutputArgument output)
         {
             Input = input;
             Output = output;
         }
 
-        public MediaFile Input { get; }
-        public MediaFile Output { get; }
+        public IInputArgument Input { get; }
+        public IOutputArgument Output { get; }
     }
 }

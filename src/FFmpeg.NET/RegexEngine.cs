@@ -65,11 +65,11 @@ namespace FFmpeg.NET
             return true;
         }
 
-		// Parse timespan string as returned by ffmpeg. No days, allow hours to
-		// exceed 23.
-		internal static bool TimeSpanLargeTryParse(string str, out TimeSpan result)
-		{
-			result = TimeSpan.Zero;
+        // Parse timespan string as returned by ffmpeg. No days, allow hours to
+        // exceed 23.
+        internal static bool TimeSpanLargeTryParse(string str, out TimeSpan result)
+        {
+            result = TimeSpan.Zero;
 
             // Process hours.
             int hours = 0;
@@ -98,7 +98,7 @@ namespace FFmpeg.NET
 
             result = new TimeSpan(0, hours, minutes, 0, (int)Math.Round(seconds * 1000.0));
             return true;
-		}
+        }
 
         private static long? GetLongValue(Match match)
             => long.TryParse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
@@ -128,11 +128,12 @@ namespace FFmpeg.NET
             var matchVideoFps = _index[Find.VideoFps].Match(fullMetadata).Groups;
             var matchVideoBitRate = _index[Find.BitRate].Match(fullMetadata);
 
-            if (engine.InputFile.MetaData == null)
-                engine.InputFile.MetaData = new MetaData();
+            var input = engine.Input;
+            if (input.MetaData == null)
+                input.MetaData = new MetaData();
 
-            if (engine.InputFile.MetaData.VideoData == null)
-                engine.InputFile.MetaData.VideoData = new MetaData.Video
+            if (input.MetaData.VideoData == null)
+                input.MetaData.VideoData = new MetaData.Video
                 {
                     Format = matchVideoFormatColorSize[1].ToString(),
                     ColorModel = matchVideoFormatColorSize[2].ToString(),
@@ -156,12 +157,12 @@ namespace FFmpeg.NET
 
             var matchAudioFormatHzChannel = _index[Find.AudioFormatHzChannel].Match(fullMetadata).Groups;
             var matchAudioBitRate = _index[Find.BitRate].Match(fullMetadata).Groups;
+            var input = engine.Input;
+            if (input.MetaData == null)
+                input.MetaData = new MetaData();
 
-            if (engine.InputFile.MetaData == null)
-                engine.InputFile.MetaData = new MetaData();
-
-            if (engine.InputFile.MetaData.AudioData == null)
-                engine.InputFile.MetaData.AudioData = new MetaData.Audio
+            if (input.MetaData.AudioData == null)
+                input.MetaData.AudioData = new MetaData.Audio
                 {
                     Format = matchAudioFormatHzChannel[1].ToString(),
                     SampleRate = matchAudioFormatHzChannel[2].ToString(),

@@ -28,14 +28,14 @@ namespace FFmpeg.NET.Tests
                 outputFiles.Add(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\output{i}.mp4")));
 
             var ffmpeg = new Engine(_fixture.FFmpegPath);
-            ffmpeg.Complete += (sender, args) => { _output.WriteLine("Complete: [{0} => {1}]", args.Input.FileInfo.Name, args.Output.FileInfo.Name); };
+            ffmpeg.Complete += (sender, args) => { _output.WriteLine("Complete: [{0} => {1}]", args.Input.Name, args.Output.Name); };
             ffmpeg.Progress += (sender, args) => { _output.WriteLine("Progress: {0}", args); };
-            ffmpeg.Error += (sender, args) => { _output.WriteLine("Error: [{0} => {1}] ExitCode: {2}\n{3}", args.Input.FileInfo.Name, args.Output.FileInfo.Name, args.Exception.ExitCode, args.Exception); };
-            ffmpeg.Data += (sender, args) => { _output.WriteLine("Data: {0} => {1} | {2}", args.Input.FileInfo.Name, args.Output.FileInfo.Name, args.Data); };
+            ffmpeg.Error += (sender, args) => { _output.WriteLine("Error: [{0} => {1}] ExitCode: {2}\n{3}", args.Input.Name, args.Output.Name, args.Exception.ExitCode, args.Exception); };
+            ffmpeg.Data += (sender, args) => { _output.WriteLine("Data: {0} => {1} | {2}", args.Input.Name, args.Output.Name, args.Data); };
 
             var tasks = new List<Task>();
             foreach (var outputFile in outputFiles)
-                tasks.Add(ffmpeg.ConvertAsync(_fixture.VideoFile, new MediaFile(outputFile)));
+                tasks.Add(ffmpeg.ConvertAsync(_fixture.VideoFile, new OutputFile(outputFile)));
 
             Task.WaitAll(tasks.ToArray());
 

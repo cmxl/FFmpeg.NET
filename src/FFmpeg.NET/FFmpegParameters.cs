@@ -1,12 +1,12 @@
 ﻿namespace FFmpeg.NET
 {
-    internal class FFmpegParameters
+    public class FFmpegParameters
     {
-        internal bool HasCustomArguments => !string.IsNullOrWhiteSpace(CustomArguments);
-        internal string CustomArguments { get; set; }
-        internal ConversionOptions ConversionOptions { get; set; }
-        internal FFmpegTask Task { get; set; }
-        internal MediaFile OutputFile { get; set; }
-        internal MediaFile InputFile { get; set; }
+        public bool HasCustomArguments => !string.IsNullOrWhiteSpace(CustomArguments);
+        public string CustomArguments { get; set; }
+        public ConversionOptions ConversionOptions { get; set; }
+        public FFmpegTask Task { get; set; }
+        public IOutputArgument Output { get; set; }
+        public IInputArgument Input { get; set; }
     }
 }

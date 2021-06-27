@@ -15,28 +15,28 @@ namespace FFmpeg.NET
             switch (parameters.Task)
             {
                 case FFmpegTask.Convert:
-                    return Convert(parameters.InputFile, parameters.OutputFile, parameters.ConversionOptions);
+                    return Convert(parameters.Input, parameters.Output, parameters.ConversionOptions);
 
                 case FFmpegTask.GetMetaData:
-                    return GetMetadata(parameters.InputFile);
+                    return GetMetadata(parameters.Input);
 
                 case FFmpegTask.GetThumbnail:
-                    return GetThumbnail(parameters.InputFile, parameters.OutputFile, parameters.ConversionOptions);
+                    return GetThumbnail(parameters.Input, parameters.Output, parameters.ConversionOptions);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private static string GetMetadata(MediaFile inputFile) => $"-i \"{inputFile.FileInfo.FullName}\" -f ffmetadata -";
+        private static string GetMetadata(IInputArgument input) => $"-i {input.Argument} -f ffmetadata -";
 
-        private static string GetThumbnail(MediaFile inputFile, MediaFile outputFile, ConversionOptions conversionOptions)
+        private static string GetThumbnail(IInputArgument input, IOutputArgument output, ConversionOptions conversionOptions)
         {
             var defaultTimeSpan = TimeSpan.FromSeconds(1);
             var commandBuilder = new StringBuilder();
 
             commandBuilder.AppendFormat(CultureInfo.InvariantCulture, " -ss {0} ", conversionOptions?.Seek.GetValueOrDefault(defaultTimeSpan).TotalSeconds ?? defaultTimeSpan.TotalSeconds);
 
-            commandBuilder.AppendFormat(" -i \"{0}\" ", inputFile.FileInfo.FullName);
+            commandBuilder.AppendFormat(" -i {0} ", input.Argument);
             commandBuilder.AppendFormat(" -vframes {0} ", 1);
 
             // Video size / resolution
@@ -48,16 +48,16 @@ namespace FFmpeg.NET
             // Video cropping
             commandBuilder = AppendVideoCropping(commandBuilder, conversionOptions);
 
-            return commandBuilder.AppendFormat(" \"{0}\" ", outputFile.FileInfo.FullName).ToString();
+            return commandBuilder.AppendFormat(" {0} ", output.Argument).ToString();
         }
 
-        private static string Convert(MediaFile inputFile, MediaFile outputFile, ConversionOptions conversionOptions)
+        private static string Convert(IInputArgument input, IOutputArgument output, ConversionOptions conversionOptions)
         {
             var commandBuilder = new StringBuilder();
 
             // Default conversion
             if (conversionOptions == null)
-                return commandBuilder.AppendFormat(" -i \"{0}\" \"{1}\" ", inputFile.FileInfo.FullName, outputFile.FileInfo.FullName).ToString();
+                return commandBuilder.Append($" -i {input.Argument} {output.Argument} ").ToString();
 
             if (conversionOptions.HideBanner) commandBuilder.Append(" -hide_banner ");
 
@@ -77,7 +77,12 @@ namespace FFmpeg.NET
             if (conversionOptions.Seek != null)
                 commandBuilder.AppendFormat(CultureInfo.InvariantCulture, " -ss {0} ", conversionOptions.Seek.Value.TotalSeconds);
 
-            commandBuilder.AppendFormat(" -i \"{0}\" ", inputFile.FileInfo.FullName);
+            if (conversionOptions.Stream)
+            {
+                commandBuilder.AppendFormat(" -re ");
+            }
+
+            commandBuilder.AppendFormat(" -i {0} ", input.Argument);
 
             // Physical media conversion (DVD etc)
             if (conversionOptions.Target != Target.Default)
@@ -85,12 +90,12 @@ namespace FFmpeg.NET
                 commandBuilder.Append(" -target ");
                 if (conversionOptions.TargetStandard != TargetStandard.Default)
                 {
-                    commandBuilder.AppendFormat(" {0}-{1} \"{2}\" ", conversionOptions.TargetStandard.ToString().ToLowerInvariant(), conversionOptions.Target.ToString().ToLowerInvariant(), outputFile.FileInfo.FullName);
+                    commandBuilder.AppendFormat(" {0}-{1} {2} ", conversionOptions.TargetStandard.ToString().ToLowerInvariant(), conversionOptions.Target.ToString().ToLowerInvariant(), output.Argument);
 
                     return commandBuilder.ToString();
                 }
 
-                commandBuilder.AppendFormat("{0} \"{1}\" ", conversionOptions.Target.ToString().ToLowerInvariant(), outputFile.FileInfo.FullName);
+                commandBuilder.AppendFormat("{0} {1} ", conversionOptions.Target.ToString().ToLowerInvariant(), output.Argument);
 
                 return commandBuilder.ToString();
             }
@@ -111,7 +116,7 @@ namespace FFmpeg.NET
 
             // Video Time Scale
             if (conversionOptions.VideoTimeScale != null && conversionOptions.VideoTimeScale != 1)
-                commandBuilder.AppendFormat(" -filter:v \"setpts = {0} * PTS\" ", conversionOptions.VideoTimeScale.ToString().Replace(",","."));
+                commandBuilder.AppendFormat(" -filter:v \"setpts = {0} * PTS\" ", conversionOptions.VideoTimeScale.ToString().Replace(",", "."));
 
             // Maximum video duration
             if (conversionOptions.MaxVideoDuration != null)
@@ -137,7 +142,7 @@ namespace FFmpeg.NET
 
             // Video cropping
             commandBuilder = AppendVideoCropping(commandBuilder, conversionOptions);
-            
+
             #region Audio
             // Audio bit rate
             if (conversionOptions.AudioBitRate != null)
@@ -162,12 +167,12 @@ namespace FFmpeg.NET
             if (conversionOptions.ExtraArguments != null)
                 commandBuilder.AppendFormat(" {0} ", conversionOptions.ExtraArguments);
 
-            return commandBuilder.AppendFormat(" \"{0}\" ", outputFile.FileInfo.FullName).ToString();
+            return commandBuilder.AppendFormat(" {0} ", output.Argument).ToString();
         }
 
         private static void AppendHWAccelOutputFormat(StringBuilder commandBuilder, ConversionOptions conversionOptions)
         {
-            if(conversionOptions.HWAccel != HWAccel.None && conversionOptions.HWAccelOutputFormatCopy)
+            if (conversionOptions.HWAccel != HWAccel.None && conversionOptions.HWAccelOutputFormatCopy)
             {
                 HWAccel accel = conversionOptions.HWAccel;
                 bool add = false;
@@ -184,7 +189,7 @@ namespace FFmpeg.NET
                     default:
                         break;
                 }
-                if(add) commandBuilder.AppendFormat(" -hwaccel_output_format {0} ", accel);
+                if (add) commandBuilder.AppendFormat(" -hwaccel_output_format {0} ", accel);
             }
         }
 
