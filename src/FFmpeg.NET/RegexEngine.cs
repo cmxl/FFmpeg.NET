@@ -17,6 +17,7 @@ namespace FFmpeg.NET
         internal static readonly Dictionary<Find, Regex> _index = new Dictionary<Find, Regex>
         {
             {Find.BitRate, new Regex(@"([0-9]*)\s*kb/s")},
+            {Find.ClipBitrate, new Regex(@"bitrate: ([0-9]*)\s*kb/s ")},
             {Find.Duration, new Regex(@"Duration: ([^,]*), ")},
             {Find.ConvertProgressFrame, new Regex(@"frame=\s*([0-9]*)")},
             {Find.ConvertProgressFps, new Regex(@"fps=\s*([0-9]*\.?[0-9]*?)")},
@@ -63,6 +64,31 @@ namespace FFmpeg.NET
             progressData = new ProgressData(processedDuration, TimeSpan.Zero, frame, fps, sizeKb, bitrate);
 
             return true;
+        }
+        internal static bool IsMediaInfo(string data, out MediaInfo mediaInfo)
+        {
+            mediaInfo = null;
+
+
+            var matchBitrate = _index[Find.BitRate].Match(data);
+            var matchDuration = _index[Find.Duration].Match(data);
+            
+            
+            if (!matchBitrate.Success|| !matchDuration.Success)
+                return false;
+
+            TimeSpanLargeTryParse(matchDuration.Groups[1].Value, out var clipDuration);
+        
+
+            var bitrate = GetDoubleValue(matchBitrate);
+            if (bitrate.HasValue)
+            {
+                mediaInfo = new MediaInfo( bitrate.Value, clipDuration);
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         // Parse timespan string as returned by ffmpeg. No days, allow hours to
@@ -181,6 +207,7 @@ namespace FFmpeg.NET
             ConvertProgressFinished,
             ConvertProgressTime,
             Duration,
+            ClipBitrate,
             MetaAudio,
             MetaVideo,
             BitRate,
