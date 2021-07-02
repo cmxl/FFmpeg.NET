@@ -69,7 +69,7 @@ namespace FFmpeg.NET
         {
             mediaInfo = null;
 
-
+            if(data==null||data=="") return false;
             var matchBitrate = _index[Find.BitRate].Match(data);
             var matchDuration = _index[Find.Duration].Match(data);
             

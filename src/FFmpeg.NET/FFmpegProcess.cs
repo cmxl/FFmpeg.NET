@@ -81,7 +81,6 @@ namespace FFmpeg.NET
         private void OnDataHandler(object sender, DataReceivedEventArgs e)
         {
             OnData(new ConversionDataEventArgs(e.Data, parameters.Input, parameters.Output));
-            tryUpdateMediaInfo(e.Data);
             FFmpegProcessOnErrorDataReceived(e, parameters, ref caughtException, messages);
         }
         private void tryUpdateMediaInfo (String data){
@@ -111,6 +110,7 @@ namespace FFmpeg.NET
 
             try
             {
+                tryUpdateMediaInfo(e.Data);
                 messages.Insert(0, e.Data);
                 if (parameters.Input != null)
                 {
