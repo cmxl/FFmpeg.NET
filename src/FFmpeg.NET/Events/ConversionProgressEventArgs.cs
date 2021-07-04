@@ -5,7 +5,7 @@ namespace FFmpeg.NET.Events
 {
     public class ConversionProgressEventArgs : EventArgs
     {
-        internal ConversionProgressEventArgs(ProgressData progressData, IInputArgument input, IOutputArgument output)
+        internal ConversionProgressEventArgs(ProgressData progressData, IInputArgument input, IOutputArgument output, MediaInfo mediaInfo)
         {
             Input = input;
             Output = output;
@@ -15,6 +15,7 @@ namespace FFmpeg.NET.Events
             Fps = progressData.Fps;
             SizeKb = progressData.SizeKb;
             Bitrate = progressData.Bitrate;
+            MediaInfo = mediaInfo;
         }
 
         public long? Frame { get; }
@@ -25,6 +26,7 @@ namespace FFmpeg.NET.Events
         public TimeSpan TotalDuration { get; }
         public IOutputArgument Output { get; }
         public IInputArgument Input { get; }
+        public MediaInfo MediaInfo{ get; }
 
         public override string ToString()
             => $"[{Input?.Name} => {Output?.Name}]\nFrame: {Frame}\nFps: {Fps}\nSize: {SizeKb}kb\nProcessedDuration: {ProcessedDuration}\nBitrate: {Bitrate}\nTotalDuration: {TotalDuration}";

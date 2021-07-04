@@ -1,6 +1,7 @@
 using FFmpeg.NET.Events;
 using FFmpeg.NET.Exceptions;
 using FFmpeg.NET.Extensions;
+using FFmpeg.NET.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,7 +15,7 @@ namespace FFmpeg.NET
         FFmpegParameters parameters;
         readonly string ffmpegFilePath;
         readonly private CancellationToken cancellationToken;
-
+        MediaInfo mediaInfo;
         List<string> messages;
         Exception caughtException = null;
 
@@ -82,7 +83,12 @@ namespace FFmpeg.NET
             OnData(new ConversionDataEventArgs(e.Data, parameters.Input, parameters.Output));
             FFmpegProcessOnErrorDataReceived(e, parameters, ref caughtException, messages);
         }
-
+        private void tryUpdateMediaInfo (String data){
+            if(this.mediaInfo ==null)
+                if( RegexEngine.IsMediaInfo(data, out var newMediaInfo)){
+                    this.mediaInfo = newMediaInfo;
+            }
+        }
         private void OnException(List<string> messages, FFmpegParameters parameters, int exitCode, Exception caughtException)
         {
             var exceptionMessage = GetExceptionMessage(messages);
@@ -104,6 +110,7 @@ namespace FFmpeg.NET
 
             try
             {
+                tryUpdateMediaInfo(e.Data);
                 messages.Insert(0, e.Data);
                 if (parameters.Input != null)
                 {
@@ -131,7 +138,7 @@ namespace FFmpeg.NET
                         progressData.TotalDuration = parameters.Input.MetaData?.Duration ?? totalMediaDuration;
                     }
 
-                    OnProgressChanged(new ConversionProgressEventArgs(progressData, parameters.Input, parameters.Output));
+                    OnProgressChanged(new ConversionProgressEventArgs(progressData, parameters.Input, parameters.Output,mediaInfo));
                 }
             }
             catch (Exception ex)
