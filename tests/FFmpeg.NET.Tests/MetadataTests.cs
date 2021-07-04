@@ -78,7 +78,6 @@ namespace FFmpeg.NET.Tests
             Assert.Equal("44100 Hz", metaData.AudioData.SampleRate);
             Assert.Equal("stereo", metaData.AudioData.ChannelOutput);
             Assert.Equal(128, metaData.AudioData.BitRateKbs);
-
             Assert.Null(metaData.VideoData);
         }
 
@@ -86,6 +85,7 @@ namespace FFmpeg.NET.Tests
         public async Task FFmpeg_Can_Read_Video_Metadata()
         {
             var ffmpeg = new Engine(_fixture.FFmpegPath);
+            ffmpeg.Data += (s, e) => _output.WriteLine(e.Data);
 
             var videoFile = _fixture.VideoFile;
             var metaData = await ffmpeg.GetMetaDataAsync(videoFile).ConfigureAwait(false);
@@ -94,7 +94,7 @@ namespace FFmpeg.NET.Tests
             Assert.Equal(metaData.FileInfo, videoFile.FileInfo);
             Assert.NotNull(metaData.VideoData);
             Assert.Equal("h264 (Main) (avc1 / 0x31637661)", metaData.VideoData.Format);
-            Assert.Equal("yuv420p,", metaData.VideoData.ColorModel);
+            Assert.Equal("yuv420p", metaData.VideoData.ColorModel);
             Assert.Equal("1280x720", metaData.VideoData.FrameSize);
             Assert.Equal(1205, metaData.VideoData.BitRateKbs);
             Assert.Equal(25, metaData.VideoData.Fps);
@@ -106,6 +106,26 @@ namespace FFmpeg.NET.Tests
             Assert.Equal(384, metaData.AudioData.BitRateKbs);
 
             Assert.Equal(metaData.Duration, new TimeSpan(0, 0, 0, 5, 310));
+        }
+
+        [Theory]
+        [InlineData("Stream #0:0(und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p, 1280x720 [SAR 1:1 DAR 16:9], 1205 kb/s, 25 fps, 25 tbr, 12800 tbn, 50 tbc (default)", 1205, "yuv420p", "1280x720", "h264 (Main) (avc1 / 0x31637661)")]
+        [InlineData("Stream #0:0(und): Video: hevc (Main 10) (hvc1 / 0x31637668), yuv420p10le(tv, bt2020/arib-std-b67, progressive), 1920x1080, 8517 kb/s, 29.98 fps, 29.97 tbr, 600 tbn, 600 tbc (default)", 8517, "yuv420p10le(tv, bt2020/arib-std-b67, progressive)", "1920x1080" , "hevc (Main 10) (hvc1 / 0x31637668)")]
+        public void RegexEngine_Can_Read_Video_MetaData(string data, int bitrate, string colorModel, string frameSize, string format)
+        {
+            var param = new FFmpegParameters
+            {
+                Input = new InputFile(_fixture.VideoFile.FileInfo)
+            };
+            RegexEngine.TestVideo(data, param);
+
+            Assert.NotNull(param.Input.MetaData);
+            Assert.NotNull(param.Input.MetaData.VideoData);
+            
+            Assert.Equal(bitrate, param.Input.MetaData.VideoData.BitRateKbs);
+            Assert.Equal(colorModel, param.Input.MetaData.VideoData.ColorModel);
+            Assert.Equal(frameSize, param.Input.MetaData.VideoData.FrameSize);
+            Assert.Equal(format, param.Input.MetaData.VideoData.Format);
         }
 
         [Fact]

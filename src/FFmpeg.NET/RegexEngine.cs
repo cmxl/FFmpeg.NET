@@ -9,7 +9,7 @@ namespace FFmpeg.NET
     /// <summary>
     ///     Contains all Regex tasks
     /// </summary>
-    internal static class RegexEngine
+    public static class RegexEngine
     {
         /// <summary>
         ///     Dictionary containing every Regex test.
@@ -28,7 +28,7 @@ namespace FFmpeg.NET
             {Find.MetaAudio, new Regex(@"(Stream\s*#[0-9]*:[0-9]*\(?[^\)]*?\)?: Audio:.*)")},
             {Find.AudioFormatHzChannel, new Regex(@"Audio:\s*([^,]*),\s([^,]*),\s([^,]*)")},
             {Find.MetaVideo, new Regex(@"(Stream\s*#[0-9]*:[0-9]*\(?[^\)]*?\)?: Video:.*)")},
-            {Find.VideoFormatColorSize, new Regex(@"Video:\s*([^,]*),\s*([^,]*,?[^,]*?),?\s*(?=[0-9]*x[0-9]*)([0-9]*x[0-9]*)")},
+            {Find.VideoFormatColorSize, new Regex(@"Video:\s*([^,]*),\s*((?:[^,]*,?[^,]*?)(?:\(.*\))?),\s*(?=[0-9]*x[0-9]*)([0-9]*x[0-9]*)")},
             {Find.VideoFps, new Regex(@"([0-9\.]*)\s*tbr")}
         };
 
@@ -69,24 +69,25 @@ namespace FFmpeg.NET
         {
             mediaInfo = null;
 
-            if(data==null||data=="") return false;
+            if (data == null || data == "") return false;
             var matchBitrate = _index[Find.BitRate].Match(data);
             var matchDuration = _index[Find.Duration].Match(data);
-            
-            
-            if (!matchBitrate.Success|| !matchDuration.Success)
+
+
+            if (!matchBitrate.Success || !matchDuration.Success)
                 return false;
 
             TimeSpanLargeTryParse(matchDuration.Groups[1].Value, out var clipDuration);
-        
+
 
             var bitrate = GetDoubleValue(matchBitrate);
             if (bitrate.HasValue)
             {
-                mediaInfo = new MediaInfo( bitrate.Value, clipDuration);
+                mediaInfo = new MediaInfo(bitrate.Value, clipDuration);
                 return true;
             }
-            else {
+            else
+            {
                 return false;
             }
         }
@@ -141,7 +142,7 @@ namespace FFmpeg.NET
                 ? result
                 : (int?)null;
 
-        internal static void TestVideo(string data, FFmpegParameters engine)
+        public static void TestVideo(string data, FFmpegParameters engine)
         {
             var matchMetaVideo = _index[Find.MetaVideo].Match(data);
 
@@ -172,7 +173,7 @@ namespace FFmpeg.NET
                 };
         }
 
-        internal static void TestAudio(string data, FFmpegParameters engine)
+        public static void TestAudio(string data, FFmpegParameters engine)
         {
             var matchMetaAudio = _index[Find.MetaAudio].Match(data);
 
