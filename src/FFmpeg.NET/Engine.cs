@@ -20,10 +20,10 @@ namespace FFmpeg.NET
         /// <param name="ffmpegPath">The path to the ffmpeg executable, or the executable if it is defined in PATH. If left empty, it will try to find "ffmpeg.exe" from PATH.</param>
         public Engine(string ffmpegPath = null)
         {
-            ffmpegPath = ffmpegPath ?? "ffmpeg.exe";
+            ffmpegPath ??= "ffmpeg.exe";
 
             if (!ffmpegPath.TryGetFullPath(out _ffmpegPath))
-                throw new ArgumentException(ffmpegPath, "FFmpeg executable could not be found neither in PATH nor in directory.");
+                throw new ArgumentException("FFmpeg executable could not be found neither in PATH nor in directory.", ffmpegPath);
         }
 
         public event EventHandler<ConversionProgressEventArgs> Progress;
@@ -31,7 +31,7 @@ namespace FFmpeg.NET
         public event EventHandler<ConversionCompleteEventArgs> Complete;
         public event EventHandler<ConversionDataEventArgs> Data;
 
-        public async Task<MetaData> GetMetaDataAsync(InputFile mediaFile, CancellationToken cancellationToken = default)
+        public async Task<MetaData> GetMetaDataAsync(InputFile mediaFile, CancellationToken cancellationToken)
         {
             var parameters = new FFmpegParameters
             {
@@ -43,10 +43,10 @@ namespace FFmpeg.NET
             return mediaFile.MetaData;
         }
 
-        public async Task<MediaFile> GetThumbnailAsync(InputFile input, OutputFile output, CancellationToken cancellationToken = default)
+        public async Task<MediaFile> GetThumbnailAsync(InputFile input, OutputFile output, CancellationToken cancellationToken)
             => await GetThumbnailAsync(input, output, default, cancellationToken).ConfigureAwait(false);
 
-        public async Task<MediaFile> GetThumbnailAsync(InputFile input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken = default)
+        public async Task<MediaFile> GetThumbnailAsync(InputFile input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken)
         {
             var parameters = new FFmpegParameters
             {
@@ -60,10 +60,10 @@ namespace FFmpeg.NET
             return output;
         }
 
-        public async Task<MediaFile> ConvertAsync(InputFile input, OutputFile output, CancellationToken cancellationToken = default)
+        public async Task<MediaFile> ConvertAsync(InputFile input, OutputFile output, CancellationToken cancellationToken)
             => await ConvertAsync(input, output, default, cancellationToken).ConfigureAwait(false);
 
-        public async Task<MediaFile> ConvertAsync(InputFile input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken = default)
+        public async Task<MediaFile> ConvertAsync(InputFile input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken)
         {
             var parameters = new FFmpegParameters
             {
@@ -96,7 +96,7 @@ namespace FFmpeg.NET
                 ConversionOptions = options
             };
 
-            var process = CreateProcess(parameters, cancellationToken);
+            var process = CreateProcess(parameters);
             var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
 
             await Task.WhenAll(
@@ -104,18 +104,19 @@ namespace FFmpeg.NET
                 {
                     await pipe.CopyToAsync(output, cancellationToken);
                 }),
-                process.ExecuteAsync().ContinueWith(x =>
+                process.ExecuteAsync(cancellationToken).ContinueWith(x =>
                 {
                     pipe.Disconnect();
                     pipe.Dispose();
-                })
+                }, cancellationToken)
             ).ConfigureAwait(false);
+            Cleanup(process);
         }
 
         private async Task ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken)
         {
-            var ffmpegProcess = CreateProcess(parameters, cancellationToken);
-            await ffmpegProcess.ExecuteAsync().ConfigureAwait(false);
+            var ffmpegProcess = CreateProcess(parameters);
+            await ffmpegProcess.ExecuteAsync(cancellationToken).ConfigureAwait(false);
             Cleanup(ffmpegProcess);
         }
 
@@ -125,9 +126,9 @@ namespace FFmpeg.NET
             await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
         }
 
-        private FFmpegProcess CreateProcess(FFmpegParameters parameters, CancellationToken cancellationToken)
+        private FFmpegProcess CreateProcess(FFmpegParameters parameters)
         {
-            var ffmpegProcess = new FFmpegProcess(parameters, _ffmpegPath, cancellationToken);
+            var ffmpegProcess = new FFmpegProcess(parameters, _ffmpegPath);
             ffmpegProcess.Progress += OnProgress;
             ffmpegProcess.Completed += OnComplete;
             ffmpegProcess.Error += OnError;
@@ -152,11 +153,8 @@ namespace FFmpeg.NET
         }
 
         private void OnProgress(ConversionProgressEventArgs e) => Progress?.Invoke(this, e);
-
         private void OnError(ConversionErrorEventArgs e) => Error?.Invoke(this, e);
-
         private void OnComplete(ConversionCompleteEventArgs e) => Complete?.Invoke(this, e);
-
         private void OnData(ConversionDataEventArgs e) => Data?.Invoke(this, e);
 
     }

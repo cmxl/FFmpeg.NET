@@ -14,22 +14,22 @@ namespace FFmpeg.NET
         /// <summary>
         ///     Dictionary containing every Regex test.
         /// </summary>
-        internal static readonly Dictionary<Find, Regex> _index = new Dictionary<Find, Regex>
+        internal static readonly Dictionary<Find, Regex> _index = new()
         {
-            {Find.BitRate, new Regex(@"([0-9]*)\s*kb/s")},
-            {Find.ClipBitrate, new Regex(@"bitrate: ([0-9]*)\s*kb/s ")},
-            {Find.Duration, new Regex(@"Duration: ([^,]*), ")},
-            {Find.ConvertProgressFrame, new Regex(@"frame=\s*([0-9]*)")},
-            {Find.ConvertProgressFps, new Regex(@"fps=\s*([0-9]*\.?[0-9]*?)")},
-            {Find.ConvertProgressSize, new Regex(@"size=\s*([0-9]*)kB")},
-            {Find.ConvertProgressFinished, new Regex(@"Lsize=\s*([0-9]*)kB")},
-            {Find.ConvertProgressTime, new Regex(@"time=\s*([^ ]*)")},
-            {Find.ConvertProgressBitrate, new Regex(@"bitrate=\s*([0-9]*\.?[0-9]*?)kbits/s")},
-            {Find.MetaAudio, new Regex(@"(Stream\s*#[0-9]*:[0-9]*\(?[^\)]*?\)?: Audio:.*)")},
-            {Find.AudioFormatHzChannel, new Regex(@"Audio:\s*([^,]*),\s([^,]*),\s([^,]*)")},
-            {Find.MetaVideo, new Regex(@"(Stream\s*#[0-9]*:[0-9]*\(?[^\)]*?\)?: Video:.*)")},
-            {Find.VideoFormatColorSize, new Regex(@"Video:\s*([^,]*),\s*((?:[^,]*,?[^,]*?)(?:\(.*\))?),\s*(?=[0-9]*x[0-9]*)([0-9]*x[0-9]*)")},
-            {Find.VideoFps, new Regex(@"([0-9\.]*)\s*tbr")}
+            { Find.BitRate, new Regex(@"([0-9]*)\s*kb/s") },
+            { Find.ClipBitrate, new Regex(@"bitrate: ([0-9]*)\s*kb/s ") },
+            { Find.Duration, new Regex(@"Duration: ([^,]*), ") },
+            { Find.ConvertProgressFrame, new Regex(@"frame=\s*([0-9]*)") },
+            { Find.ConvertProgressFps, new Regex(@"fps=\s*([0-9]*\.?[0-9]*?)") },
+            { Find.ConvertProgressSize, new Regex(@"size=\s*([0-9]*)kB") },
+            { Find.ConvertProgressFinished, new Regex(@"Lsize=\s*([0-9]*)kB") },
+            { Find.ConvertProgressTime, new Regex(@"time=\s*([^ ]*)") },
+            { Find.ConvertProgressBitrate, new Regex(@"bitrate=\s*([0-9]*\.?[0-9]*?)kbits/s") },
+            { Find.MetaAudio, new Regex(@"(Stream\s*#[0-9]*:[0-9]*\(?[^\)]*?\)?: Audio:.*)") },
+            { Find.AudioFormatHzChannel, new Regex(@"Audio:\s*([^,]*),\s([^,]*),\s([^,]*)") },
+            { Find.MetaVideo, new Regex(@"(Stream\s*#[0-9]*:[0-9]*\(?[^\)]*?\)?: Video:.*)") },
+            { Find.VideoFormatColorSize, new Regex(@"Video:\s*([^,]*),\s*((?:[^,]*,?[^,]*?)(?:\(.*\))?),\s*(?=[0-9]*x[0-9]*)([0-9]*x[0-9]*)") },
+            { Find.VideoFps, new Regex(@"([0-9\.]*)\s*tbr") }
         };
 
         /// <summary>
@@ -73,12 +73,10 @@ namespace FFmpeg.NET
             var matchBitrate = _index[Find.BitRate].Match(data);
             var matchDuration = _index[Find.Duration].Match(data);
 
-
             if (!matchBitrate.Success || !matchDuration.Success)
                 return false;
 
             TimeSpanLargeTryParse(matchDuration.Groups[1].Value, out var clipDuration);
-
 
             var bitrate = GetDoubleValue(matchBitrate);
             if (bitrate.HasValue)
@@ -99,28 +97,25 @@ namespace FFmpeg.NET
             result = TimeSpan.Zero;
 
             // Process hours.
-            int hours = 0;
-            int start = 0;
-            int end = str.IndexOf(':', start);
+            var start = 0;
+            var end = str.IndexOf(':', start);
             if (end < 0)
                 return false;
-            if (!int.TryParse(str.Substring(start, end - start), out hours))
+            if (!int.TryParse(str[start..end], out var hours))
                 return false;
 
             // Process minutes
-            int minutes = 0;
             start = end + 1;
             end = str.IndexOf(':', start);
             if (end < 0)
                 return false;
-            if (!int.TryParse(str.Substring(start, end - start), out minutes))
+            if (!int.TryParse(str[start..end], out var minutes))
                 return false;
 
             // Process seconds
-            double seconds = 0.0;
             start = end + 1;
             // ffmpeg doesnt respect the computers culture
-            if (!double.TryParse(str.Substring(start), NumberStyles.Number, CultureInfo.InvariantCulture, out seconds))
+            if (!double.TryParse(str[start..], NumberStyles.Number, CultureInfo.InvariantCulture, out var seconds))
                 return false;
 
             result = new TimeSpan(0, hours, minutes, 0, (int)Math.Round(seconds * 1000.0));
@@ -130,17 +125,17 @@ namespace FFmpeg.NET
         private static long? GetLongValue(Match match)
             => long.TryParse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
                 ? result
-                : (long?)null;
+                : null;
 
         private static double? GetDoubleValue(Match match)
             => double.TryParse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
                 ? result
-                : (double?)null;
+                : null;
 
         private static int? GetIntValue(Match match)
             => int.TryParse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
                 ? result
-                : (int?)null;
+                : null;
 
         public static void TestVideo(string data, FFmpegParameters engine)
         {
@@ -168,7 +163,7 @@ namespace FFmpeg.NET
                     Fps = matchVideoFps[1].Success && !string.IsNullOrEmpty(matchVideoFps[1].ToString()) ? Convert.ToDouble(matchVideoFps[1].ToString(), new CultureInfo("en-US")) : 0,
                     BitRateKbs =
                         matchVideoBitRate.Success
-                            ? (int?)Convert.ToInt32(matchVideoBitRate.Groups[1].ToString())
+                            ? Convert.ToInt32(matchVideoBitRate.Groups[1].ToString())
                             : null
                 };
         }

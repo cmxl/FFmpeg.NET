@@ -12,19 +12,13 @@ namespace FFmpeg.NET
             if (parameters.HasCustomArguments)
                 return parameters.CustomArguments;
 
-            switch (parameters.Task)
+            return parameters.Task switch
             {
-                case FFmpegTask.Convert:
-                    return Convert(parameters.Input, parameters.Output, parameters.ConversionOptions);
-
-                case FFmpegTask.GetMetaData:
-                    return GetMetadata(parameters.Input);
-
-                case FFmpegTask.GetThumbnail:
-                    return GetThumbnail(parameters.Input, parameters.Output, parameters.ConversionOptions);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                FFmpegTask.Convert => Convert(parameters.Input, parameters.Output, parameters.ConversionOptions),
+                FFmpegTask.GetMetaData => GetMetadata(parameters.Input),
+                FFmpegTask.GetThumbnail => GetThumbnail(parameters.Input, parameters.Output, parameters.ConversionOptions),
+                _ => throw new ArgumentOutOfRangeException(),
+            };
         }
 
         private static string GetMetadata(IInputArgument input) => $"-i {input.Argument} -f ffmetadata -";

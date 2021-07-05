@@ -10,84 +10,82 @@ using System.Threading.Tasks;
 
 namespace FFmpeg.NET
 {
-    public sealed class FFmpegProcess
+    internal sealed class FFmpegProcess
     {
-        FFmpegParameters parameters;
-        readonly string ffmpegFilePath;
-        readonly private CancellationToken cancellationToken;
-        MediaInfo mediaInfo;
-        List<string> messages;
-        Exception caughtException = null;
+        private readonly FFmpegParameters _parameters;
+        private readonly string _ffmpegFilePath;
 
-        public FFmpegProcess(FFmpegParameters parameters, string ffmpegFilePath, CancellationToken cancellationToken = default)
+        private MediaInfo _mediaInfo;
+        private List<string> _messages;
+        private Exception _caughtException = null;
+
+        public FFmpegProcess(FFmpegParameters parameters, string ffmpegFilePath)
         {
-            this.parameters = parameters;
-            this.ffmpegFilePath = ffmpegFilePath;
-            this.cancellationToken = cancellationToken;
+            _parameters = parameters;
+            _ffmpegFilePath = ffmpegFilePath;
         }
 
-        public async Task ExecuteAsync()
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            messages = new List<string>();
-            caughtException = null;
-            string arguments = FFmpegArgumentBuilder.Build(parameters);
-            ProcessStartInfo startInfo = GenerateStartInfo(ffmpegFilePath, arguments);
-            await ExecuteAsync(startInfo, parameters, cancellationToken).ConfigureAwait(false);
+            _messages = new List<string>();
+            _caughtException = null;
+            string arguments = FFmpegArgumentBuilder.Build(_parameters);
+            ProcessStartInfo startInfo = GenerateStartInfo(_ffmpegFilePath, arguments);
+            await ExecuteAsync(startInfo, _parameters, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task ExecuteAsync(ProcessStartInfo startInfo, FFmpegParameters parameters, CancellationToken cancellationToken = default)
+        private async Task ExecuteAsync(ProcessStartInfo startInfo, FFmpegParameters parameters, CancellationToken cancellationToken)
         {
-            using (Process ffmpegProcess = new Process() { StartInfo = startInfo })
+            using var ffmpegProcess = new Process() { StartInfo = startInfo };
+            ffmpegProcess.ErrorDataReceived += OnDataHandler;
+
+            Task<int> task = null;
+            try
             {
-                ffmpegProcess.ErrorDataReceived += OnDataHandler;
+                task = ffmpegProcess.WaitForExitAsync(null, cancellationToken);
+                await task.ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // An exception occurs if the user cancels the operation by calling Cancel on the CancellationToken.
+                // Exc.Message will be "A task was canceled." (in English).
+                // task.IsCanceled will be true.
+                if (task.IsCanceled)
+                {
+                    throw new TaskCanceledException(task);
+                }
+                // I don't think this can occur, but if some other exception, rethrow it.
+                throw;
+            }
+            finally
+            {
+                task?.Dispose();
+                ffmpegProcess.ErrorDataReceived -= OnDataHandler;
+            }
 
 
-                Task<int> task = null;
-                try
-                {
-                    task = ffmpegProcess.WaitForExitAsync(null, cancellationToken);
-                    await task.ConfigureAwait(false);
-                }
-                catch (Exception)
-                {
-                    // An exception occurs if the user cancels the operation by calling Cancel on the CancellationToken.
-                    // Exc.Message will be "A task was canceled." (in English).
-                    // task.IsCanceled will be true.
-                    if (task.IsCanceled)
-                    {
-                        throw new TaskCanceledException(task);
-                    }
-                    // I don't think this can occur, but if some other exception, rethrow it.
-                    throw;
-                }
-                finally
-                {
-                    task?.Dispose();
-                    ffmpegProcess.ErrorDataReceived -= OnDataHandler;
-                }
-
-
-                if (caughtException != null || ffmpegProcess.ExitCode != 0)
-                {
-                    OnException(messages, parameters, ffmpegProcess.ExitCode, caughtException);
-                }
-                else
-                {
-                    OnConversionCompleted(new ConversionCompleteEventArgs(parameters.Input, parameters.Output));
-                }
+            if (_caughtException != null || ffmpegProcess.ExitCode != 0)
+            {
+                OnException(_messages, parameters, ffmpegProcess.ExitCode, _caughtException);
+            }
+            else
+            {
+                OnConversionCompleted(new ConversionCompleteEventArgs(parameters.Input, parameters.Output));
             }
         }
 
         private void OnDataHandler(object sender, DataReceivedEventArgs e)
         {
-            OnData(new ConversionDataEventArgs(e.Data, parameters.Input, parameters.Output));
-            FFmpegProcessOnErrorDataReceived(e, parameters, ref caughtException, messages);
+            OnData(new ConversionDataEventArgs(e.Data, _parameters.Input, _parameters.Output));
+            FFmpegProcessOnErrorDataReceived(e, _parameters, ref _caughtException, _messages);
         }
-        private void tryUpdateMediaInfo (String data){
-            if(this.mediaInfo ==null)
-                if( RegexEngine.IsMediaInfo(data, out var newMediaInfo)){
-                    this.mediaInfo = newMediaInfo;
-            }
+        private void TryUpdateMediaInfo(string data)
+        {
+            if (_mediaInfo == null)
+                if (RegexEngine.IsMediaInfo(data, out var newMediaInfo))
+                {
+                    _mediaInfo = newMediaInfo;
+                }
         }
         private void OnException(List<string> messages, FFmpegParameters parameters, int exitCode, Exception caughtException)
         {
@@ -96,7 +94,7 @@ namespace FFmpeg.NET
             OnConversionError(new ConversionErrorEventArgs(exception, parameters.Input, parameters.Output));
         }
 
-        private string GetExceptionMessage(List<string> messages)
+        private static string GetExceptionMessage(List<string> messages)
             => messages.Count > 1
                 ? messages[1] + messages[0]
                 : string.Join(string.Empty, messages);
@@ -110,7 +108,7 @@ namespace FFmpeg.NET
 
             try
             {
-                tryUpdateMediaInfo(e.Data);
+                TryUpdateMediaInfo(e.Data);
                 messages.Insert(0, e.Data);
                 if (parameters.Input != null)
                 {
@@ -138,7 +136,7 @@ namespace FFmpeg.NET
                         progressData.TotalDuration = parameters.Input.MetaData?.Duration ?? totalMediaDuration;
                     }
 
-                    OnProgressChanged(new ConversionProgressEventArgs(progressData, parameters.Input, parameters.Output,mediaInfo));
+                    OnProgressChanged(new ConversionProgressEventArgs(progressData, parameters.Input, parameters.Output, _mediaInfo));
                 }
             }
             catch (Exception ex)
@@ -147,7 +145,7 @@ namespace FFmpeg.NET
             }
         }
 
-        private ProcessStartInfo GenerateStartInfo(string ffmpegPath, string arguments) => new ProcessStartInfo
+        private static ProcessStartInfo GenerateStartInfo(string ffmpegPath, string arguments) => new()
         {
             // -y overwrite output files
             Arguments = "-y " + arguments,

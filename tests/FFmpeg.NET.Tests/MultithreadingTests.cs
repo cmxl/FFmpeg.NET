@@ -35,7 +35,7 @@ namespace FFmpeg.NET.Tests
 
             var tasks = new List<Task>();
             foreach (var outputFile in outputFiles)
-                tasks.Add(ffmpeg.ConvertAsync(_fixture.VideoFile, new OutputFile(outputFile)));
+                tasks.Add(ffmpeg.ConvertAsync(_fixture.VideoFile, new OutputFile(outputFile), default));
 
             Task.WaitAll(tasks.ToArray());
 
@@ -50,9 +50,9 @@ namespace FFmpeg.NET.Tests
         [Fact]
         public void Multiple_FFmpeg_Instances_At_Once_Do_Not_Throw_Exception()
         {
-            var task1 = new Engine(_fixture.FFmpegPath).GetMetaDataAsync(_fixture.VideoFile);
-            var task2 = new Engine(_fixture.FFmpegPath).GetMetaDataAsync(_fixture.VideoFile);
-            var task3 = new Engine(_fixture.FFmpegPath).GetMetaDataAsync(_fixture.VideoFile);
+            var task1 = new Engine(_fixture.FFmpegPath).GetMetaDataAsync(_fixture.VideoFile, default);
+            var task2 = new Engine(_fixture.FFmpegPath).GetMetaDataAsync(_fixture.VideoFile, default);
+            var task3 = new Engine(_fixture.FFmpegPath).GetMetaDataAsync(_fixture.VideoFile, default);
             Task.WaitAll(task1, task2, task3);
         }
     }

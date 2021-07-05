@@ -1,11 +1,11 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using FFmpeg.NET.Events;
 using FFmpeg.NET.Tests.Fixtures;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
-using System.Diagnostics;
 
 namespace FFmpeg.NET.Tests
 {
@@ -34,7 +34,7 @@ namespace FFmpeg.NET.Tests
             ffmpeg.Progress += Ffmpeg_Progress;
 
             OutputFile output = new OutputFile("LongAudio.aif");
-            await ffmpeg.ConvertAsync(audioFile, output).ConfigureAwait(false);
+            await ffmpeg.ConvertAsync(audioFile, output, default).ConfigureAwait(false);
 
             ffmpeg.Progress -= Ffmpeg_Progress;
             output.FileInfo.Delete();
@@ -57,9 +57,9 @@ namespace FFmpeg.NET.Tests
             var e = await Assert.RaisesAsync<ConversionCompleteEventArgs>(
                 x => ffmpeg.Complete += x,
                 x => ffmpeg.Complete -= x,
-                async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output)
+                async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output, default)
             ).ConfigureAwait(false);
-            
+
             Assert.True(File.Exists(output.FileInfo.FullName));
             output.FileInfo.Delete();
             Assert.False(File.Exists(output.FileInfo.FullName));
@@ -80,7 +80,7 @@ namespace FFmpeg.NET.Tests
             var e = await Assert.RaisesAsync<ConversionErrorEventArgs>(
                 x => ffmpeg.Error += x,
                 x => ffmpeg.Error -= x,
-                async () => await ffmpeg.ConvertAsync(input, output))
+                async () => await ffmpeg.ConvertAsync(input, output, default))
                 .ConfigureAwait(false);
 
             Assert.NotNull(e);
@@ -127,7 +127,7 @@ namespace FFmpeg.NET.Tests
             var e = await Assert.RaisesAsync<ConversionProgressEventArgs>(
                 x => ffmpeg.Progress += x,
                 x => ffmpeg.Progress -= x,
-                async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output)
+                async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output, default)
             ).ConfigureAwait(false);
 
             Assert.True(File.Exists(output.FileInfo.FullName));
@@ -149,7 +149,7 @@ namespace FFmpeg.NET.Tests
             var e = await Assert.RaisesAsync<ConversionDataEventArgs>(
                 x => ffmpeg.Data += x,
                 x => ffmpeg.Data -= x,
-                async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output)
+                async () => await ffmpeg.ConvertAsync(_fixture.VideoFile, output, default)
             ).ConfigureAwait(false);
 
             Assert.True(File.Exists(output.FileInfo.FullName));

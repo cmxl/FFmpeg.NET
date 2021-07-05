@@ -24,7 +24,7 @@ namespace FFmpeg.NET.Sample
                 ffmpeg.Error += OnError;
                 ffmpeg.Complete += OnComplete;
 
-                var output = await ffmpeg.ConvertAsync(inputFile, outputFile).ConfigureAwait(false);
+                var output = await ffmpeg.ConvertAsync(inputFile, outputFile, default).ConfigureAwait(false);
 
                 var thumbNail = await ffmpeg.GetThumbnailAsync(new InputFile(output.FileInfo.FullName), thumbNailFile,
                     new ConversionOptions
@@ -32,9 +32,10 @@ namespace FFmpeg.NET.Sample
                         Seek = TimeSpan.FromSeconds(3),
                         VideoSize = Enums.VideoSize.Custom,
                         SourceCrop = new CropRectangle { X = 100, Width = 200, Y = 100, Height = 100 }
-                    }).ConfigureAwait(false);
+                    }, default)
+                    .ConfigureAwait(false);
 
-                var metadata = await ffmpeg.GetMetaDataAsync(new InputFile(output.FileInfo.FullName)).ConfigureAwait(false);
+                var metadata = await ffmpeg.GetMetaDataAsync(new InputFile(output.FileInfo.FullName), default).ConfigureAwait(false);
 
                 Console.WriteLine(metadata.FileInfo.FullName);
                 Console.WriteLine(metadata);
