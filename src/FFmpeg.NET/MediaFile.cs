@@ -29,6 +29,7 @@ namespace FFmpeg.NET
 
         public string Name => FileInfo.FullName;
         public string Argument => $"\"{FileInfo.FullName}\"";
+        public bool UseStandardInput => false;
     }
 
     public class OutputFile : MediaFile, IOutputArgument

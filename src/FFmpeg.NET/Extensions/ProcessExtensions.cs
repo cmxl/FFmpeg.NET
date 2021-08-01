@@ -7,7 +7,7 @@ namespace FFmpeg.NET.Extensions
 {
     public static class ProcessExtensions
     {
-        public static Task<int> WaitForExitAsync(this Process process, Action<int> onException, CancellationToken cancellationToken = default)
+        public static Task<int> WaitForExitAsync(this Process process, bool stdInDataInput, Action<int> onException, CancellationToken cancellationToken = default)
         {
             CancellationTokenRegistration ctRegistration = new CancellationTokenRegistration();
             bool mustUnregister = false;
@@ -19,8 +19,17 @@ namespace FFmpeg.NET.Extensions
                 {
                     try
                     {
-                        // Send "q" to ffmpeg, which will force it to stop (closing files).
-                        process.StandardInput.Write("q");
+                        if (stdInDataInput)
+                        {
+                            // If standard input used for data input just close it.
+                            // It will force process to stop (closing files).
+                            process.StandardInput.Close();
+                        }
+                        else
+                        {
+                            // Send "q" to ffmpeg, which will force it to stop (closing files).
+                            process.StandardInput.Write("q");
+                        }
                     }
                     catch (InvalidOperationException)
                     {

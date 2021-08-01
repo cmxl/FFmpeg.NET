@@ -42,20 +42,37 @@ namespace FFmpeg.NET
             Task<int> task = null;
             try
             {
-                task = ffmpegProcess.WaitForExitAsync(null, cancellationToken);
-                await task.ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                // An exception occurs if the user cancels the operation by calling Cancel on the CancellationToken.
-                // Exc.Message will be "A task was canceled." (in English).
-                // task.IsCanceled will be true.
-                if (task.IsCanceled)
+                var useStandardInput = _parameters.Input?.UseStandardInput == true;
+                task = ffmpegProcess.WaitForExitAsync(useStandardInput, null, cancellationToken);
+                
+                var inputHandler = _parameters.Input as IProcessExecutionHandler;
+
+                if (inputHandler is not null)
                 {
-                    throw new TaskCanceledException(task);
+                    await inputHandler.HandleProcessStartedAsync(ffmpegProcess, cancellationToken).ConfigureAwait(false);
                 }
-                // I don't think this can occur, but if some other exception, rethrow it.
-                throw;
+
+                try
+                {
+                    await task.ConfigureAwait(false);
+                }
+                catch (Exception)
+                {
+                    // An exception occurs if the user cancels the operation by calling Cancel on the CancellationToken.
+                    // Exc.Message will be "A task was canceled." (in English).
+                    // task.IsCanceled will be true.
+                    if (task.IsCanceled)
+                    {
+                        throw new TaskCanceledException(task);
+                    }
+                    // I don't think this can occur, but if some other exception, rethrow it.
+                    throw;
+                }
+
+                if (inputHandler is not null)
+                {
+                    await inputHandler.HandleProcessExitedAsync(ffmpegProcess, cancellationToken).ConfigureAwait(false);
+                }
             }
             finally
             {
@@ -118,10 +135,13 @@ namespace FFmpeg.NET
                     var matchDuration = RegexEngine._index[RegexEngine.Find.Duration].Match(e.Data);
                     if (matchDuration.Success)
                     {
-                        if (parameters.Input is MediaFile input)
+                        if (parameters.Input is IHasMetaData input)
                         {
                             if (input.MetaData == null)
-                                input.MetaData = new MetaData { FileInfo = input.FileInfo };
+                                input.MetaData = new MetaData
+                                {
+                                    FileInfo = (parameters.Input as MediaFile)?.FileInfo
+                                };
 
                             RegexEngine.TimeSpanLargeTryParse(matchDuration.Groups[1].Value, out totalMediaDuration);
                             input.MetaData.Duration = totalMediaDuration;
