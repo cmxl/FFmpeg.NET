@@ -99,6 +99,28 @@ namespace FFmpeg.NET
             var process = CreateProcess(parameters);
             var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
 
+            await pipe.WaitForConnectionAsync(cancellationToken);
+            await Task.WhenAll(
+                pipe.CopyToAsync(output, cancellationToken),
+                process.ExecuteAsync(cancellationToken).ContinueWith(x =>
+                {
+                    pipe.Disconnect();
+                    pipe.Dispose();
+                }, cancellationToken)
+            ).ConfigureAwait(false);
+            Cleanup(process);
+        }
+
+        public async Task ConvertAsync(IArgument argument, Stream output, CancellationToken cancellationToken)
+        {
+            var outputPipeName = $"{_pipePrefix}{Guid.NewGuid()}";
+            var outputArgument = new OutputPipe(GetPipePath(outputPipeName));
+            var pipe = new NamedPipeServerStream(outputPipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+
+            var arguments = argument.Argument + $" {outputArgument.Argument}";
+            var parameters = new FFmpegParameters { CustomArguments = arguments };
+            var process = CreateProcess(parameters);
+
             await Task.WhenAll(
                 pipe.WaitForConnectionAsync(cancellationToken).ContinueWith(async x =>
                 {
@@ -110,6 +132,7 @@ namespace FFmpeg.NET
                     pipe.Dispose();
                 }, cancellationToken)
             ).ConfigureAwait(false);
+
             Cleanup(process);
         }
 
@@ -122,7 +145,11 @@ namespace FFmpeg.NET
 
         public async Task ExecuteAsync(string arguments, CancellationToken cancellationToken)
         {
-            var parameters = new FFmpegParameters { CustomArguments = arguments };
+            var parameters = new FFmpegParameters
+            {
+                CustomArguments = arguments,
+
+            };
             await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
         }
 

@@ -58,4 +58,17 @@ namespace FFmpeg.NET
         public string Argument => $"\"{PipePath}\"";
 
     }
+
+    public class InputPipe : IInputArgument
+    {
+        public InputPipe(string pipePath)
+        {
+            PipePath = pipePath;
+        }
+
+        public string PipePath { get; }
+
+        public string Argument => $"\"{PipePath}\"";
+        public MetaData MetaData { get; set; }
+    }
 }
