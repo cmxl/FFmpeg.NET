@@ -33,14 +33,17 @@ namespace FFmpeg.NET
             commandBuilder.AppendFormat(" -i {0} ", input.Argument);
             commandBuilder.AppendFormat(" -vframes {0} ", 1);
 
-            // Video size / resolution
-            commandBuilder = AppendVideoSize(commandBuilder, conversionOptions);
+            if (conversionOptions != null)
+            {
+                // Video size / resolution
+                commandBuilder = AppendVideoSize(commandBuilder, conversionOptions);
 
-            // Video aspect ratio
-            commandBuilder = AppendVideoAspectRatio(commandBuilder, conversionOptions);
+                // Video aspect ratio
+                commandBuilder = AppendVideoAspectRatio(commandBuilder, conversionOptions);
 
-            // Video cropping
-            commandBuilder = AppendVideoCropping(commandBuilder, conversionOptions);
+                // Video cropping
+                commandBuilder = AppendVideoCropping(commandBuilder, conversionOptions);
+            }
 
             return commandBuilder.AppendFormat(" {0} ", output.Argument).ToString();
         }
