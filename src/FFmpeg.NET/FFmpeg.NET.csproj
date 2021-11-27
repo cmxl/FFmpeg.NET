@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>FFmpeg.NET</AssemblyName>
     <RootNamespace>FFmpeg.NET</RootNamespace>
     <Authors>Tobias Haimerl (cmxl)</Authors>
@@ -15,7 +15,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <Description>.NET wrapper for common ffmpeg tasks.</Description>
     <PackageId>xFFmpeg.NET</PackageId>
-    <Version>6.0.0</Version>
+    <Version>7.0.0</Version>
     <PackageLicense>LICENSE.md</PackageLicense>
     <AssemblyVersion>6.0.0</AssemblyVersion>
     <FileVersion>6.0.0</FileVersion>
