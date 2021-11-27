@@ -15,11 +15,11 @@
     <PackageIcon>icon.png</PackageIcon>
     <Description>.NET wrapper for common ffmpeg tasks.</Description>
     <PackageId>xFFmpeg.NET</PackageId>
-    <Version>7.0.0</Version>
+    <Version>7.0.1</Version>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicense>LICENSE.md</PackageLicense>
-    <AssemblyVersion>7.0.0</AssemblyVersion>
-    <FileVersion>7.0.0</FileVersion>
+    <AssemblyVersion>7.0.1</AssemblyVersion>
+    <FileVersion>7.0.1</FileVersion>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
