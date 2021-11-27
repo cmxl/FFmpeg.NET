@@ -16,9 +16,10 @@
     <Description>.NET wrapper for common ffmpeg tasks.</Description>
     <PackageId>xFFmpeg.NET</PackageId>
     <Version>7.0.0</Version>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicense>LICENSE.md</PackageLicense>
-    <AssemblyVersion>6.0.0</AssemblyVersion>
-    <FileVersion>6.0.0</FileVersion>
+    <AssemblyVersion>7.0.0</AssemblyVersion>
+    <FileVersion>7.0.0</FileVersion>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
@@ -26,7 +27,8 @@
 
   <ItemGroup>
     <None Include="Resources\icon.png" Pack="true" PackagePath="\" />
-    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" />
+	<None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
