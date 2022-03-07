@@ -52,6 +52,8 @@ namespace FFmpeg.NET
                 // task.IsCanceled will be true.
                 if (task.IsCanceled)
                 {
+                    if (!ffmpegProcess.HasExited)
+                        ffmpegProcess.Kill();
                     throw new TaskCanceledException(task);
                 }
                 // I don't think this can occur, but if some other exception, rethrow it.
