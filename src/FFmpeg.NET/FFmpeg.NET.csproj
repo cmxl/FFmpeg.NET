@@ -11,24 +11,24 @@
     <PackageProjectUrl>https://github.com/cmxl/FFmpeg.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cmxl/FFmpeg.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>ffmpeg, dotnet, net5</PackageTags>
-    <PackageIcon>icon.png</PackageIcon>
+    <PackageTags>ffmpeg, dotnet, netstandard2.1</PackageTags>
     <Description>.NET wrapper for common ffmpeg tasks.</Description>
     <PackageId>xFFmpeg.NET</PackageId>
     <Version>7.1.2</Version>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicense>LICENSE.md</PackageLicense>
     <AssemblyVersion>7.1.2</AssemblyVersion>
     <FileVersion>7.1.2</FileVersion>
-    <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
+	<ApplicationIcon />
+	<PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="Resources\icon.png" Pack="true" PackagePath="\" />
-    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" />
-	<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
+	<None Include="..\..\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
