@@ -2,7 +2,7 @@
 
 namespace FFmpeg.NET
 {
-    public class MediaFile : IHasMetaData
+    public abstract class MediaFile : IHasMetaData
     {
         public MediaFile(string file) : this(new FileInfo(file))
         {

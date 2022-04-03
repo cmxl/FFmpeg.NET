@@ -30,11 +30,11 @@ namespace FFmpeg.NET.Tests
                 return;
             }
 
-            MediaFile output = new MediaFile(outputFileInfo);
-            MediaFile temp1 = new MediaFile("Long1.mp3");
-            MediaFile temp2 = new MediaFile("Long2.mp3");
-            MediaFile temp3 = new MediaFile("Long3.mp3");
-            MediaFile temp4 = new MediaFile("Long4.mp3");
+            MediaFile output = new OutputFile(outputFileInfo);
+            MediaFile temp1 = new OutputFile("Long1.mp3");
+            MediaFile temp2 = new OutputFile("Long2.mp3");
+            MediaFile temp3 = new OutputFile("Long3.mp3");
+            MediaFile temp4 = new OutputFile("Long4.mp3");
 
             string p = $"-i \"{inputFile.FileInfo.FullName}\" -ar 8K -q:a 9 -ac 1 -f mp3 -y \"{temp1.FileInfo.FullName}\"";
 
