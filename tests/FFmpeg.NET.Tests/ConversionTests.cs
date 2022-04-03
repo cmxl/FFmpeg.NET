@@ -3,6 +3,7 @@ using FFmpeg.NET.Tests.Fixtures;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -160,6 +161,54 @@ namespace FFmpeg.NET.Tests
             Assert.Equal(e.Sender, ffmpeg);
             Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.Name);
             Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.Name);
+        }
+
+        [Fact]
+        public async Task FFmpeg_Should_Process_Conversion_Using_Stream_Input()
+        {
+            var output = new OutputFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.flv")));
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
+
+             var stream = new FileStream(_fixture.FlvVideoFile.FileInfo.FullName, FileMode.Open, FileAccess.Read);
+             await using var input = new StreamInput(stream, true);
+
+            var ffmpegTask = ffmpeg.ConvertAsync(input, output, CancellationToken.None);
+            await ffmpegTask;
+
+            Assert.True(File.Exists(output.FileInfo.FullName));
+            output.FileInfo.Delete();
+            Assert.False(File.Exists(output.FileInfo.FullName));
+        }
+
+        [Fact]
+        public async Task FFmpeg_Should_Process_Conversion_Using_StandardInputWriter_Input()
+        {
+            var output = new OutputFile(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"MediaFiles\conversionTest.flv")));
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
+            var input = new StandardInputWriter();
+
+            var ffmpegTask = ffmpeg.ConvertAsync(input, output, CancellationToken.None);
+            await PopulateStdInAsync(_fixture.FlvVideoFile.FileInfo, input);
+            await ffmpegTask;
+
+            Assert.True(File.Exists(output.FileInfo.FullName));
+            output.FileInfo.Delete();
+            Assert.False(File.Exists(output.FileInfo.FullName));
+        }
+
+        private async Task PopulateStdInAsync(FileInfo file, StandardInputWriter input)
+        {
+            await using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read);
+
+            var buffer = new byte[64 * 1024];
+            var bytesRead = 0;
+            do
+            {
+                bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                await input.WriteAsync(buffer, 0, bytesRead);
+            } while (bytesRead > 0 && input.IsOpen);
+
+            input.Close();
         }
     }
 }

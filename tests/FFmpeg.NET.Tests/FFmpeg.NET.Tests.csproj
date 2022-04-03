@@ -7,12 +7,16 @@
 
   <ItemGroup>
     <None Remove="MediaFiles\SampleAudio_0.4mb.mp3" />
+    <None Remove="MediaFiles\SampleVideo_1280x720_1mb.flv" />
     <None Remove="MediaFiles\SampleVideo_1280x720_1mb.mp4" />
     <None Remove="test.xspf" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="MediaFiles\SampleAudio_0.4mb.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MediaFiles\SampleVideo_1280x720_1mb.flv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="MediaFiles\SampleVideo_1280x720_1mb.mp4">

@@ -21,7 +21,11 @@ namespace FFmpeg.NET
             };
         }
 
-        private static string GetMetadata(IInputArgument input) => $"-i {input.Argument} -f ffmetadata -";
+        private static string GetMetadata(IInputArgument input)
+        {
+            var noStdInArg = input.UseStandardInput ? "-nostdin" : string.Empty;
+            return $"-i {input.Argument} {noStdInArg} -f ffmetadata -";;
+        }
 
         private static string GetThumbnail(IInputArgument input, IOutputArgument output, ConversionOptions conversionOptions)
         {
@@ -31,6 +35,12 @@ namespace FFmpeg.NET
             commandBuilder.AppendFormat(CultureInfo.InvariantCulture, " -ss {0} ", conversionOptions?.Seek.GetValueOrDefault(defaultTimeSpan).TotalSeconds ?? defaultTimeSpan.TotalSeconds);
 
             commandBuilder.AppendFormat(" -i {0} ", input.Argument);
+
+            if (input.UseStandardInput)
+            {
+                commandBuilder.Append(" -nostdin ");
+            }
+
             commandBuilder.AppendFormat(" -vframes {0} ", 1);
 
             if (conversionOptions != null)
@@ -51,6 +61,11 @@ namespace FFmpeg.NET
         private static string Convert(IInputArgument input, IOutputArgument output, ConversionOptions conversionOptions)
         {
             var commandBuilder = new StringBuilder();
+
+            if (input.UseStandardInput)
+            {
+                commandBuilder.Append(" -nostdin ");
+            }
 
             // Default conversion
             if (conversionOptions == null)

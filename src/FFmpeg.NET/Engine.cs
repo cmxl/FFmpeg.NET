@@ -31,7 +31,7 @@ namespace FFmpeg.NET
         public event EventHandler<ConversionCompleteEventArgs> Complete;
         public event EventHandler<ConversionDataEventArgs> Data;
 
-        public async Task<MetaData> GetMetaDataAsync(InputFile mediaFile, CancellationToken cancellationToken)
+        public async Task<MetaData> GetMetaDataAsync(IInputArgument mediaFile, CancellationToken cancellationToken)
         {
             var parameters = new FFmpegParameters
             {
@@ -43,10 +43,10 @@ namespace FFmpeg.NET
             return mediaFile.MetaData;
         }
 
-        public async Task<MediaFile> GetThumbnailAsync(InputFile input, OutputFile output, CancellationToken cancellationToken)
+        public async Task<MediaFile> GetThumbnailAsync(IInputArgument input, OutputFile output, CancellationToken cancellationToken)
             => await GetThumbnailAsync(input, output, default, cancellationToken).ConfigureAwait(false);
 
-        public async Task<MediaFile> GetThumbnailAsync(InputFile input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken)
+        public async Task<MediaFile> GetThumbnailAsync(IInputArgument input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken)
         {
             var parameters = new FFmpegParameters
             {
@@ -60,10 +60,10 @@ namespace FFmpeg.NET
             return output;
         }
 
-        public async Task<MediaFile> ConvertAsync(InputFile input, OutputFile output, CancellationToken cancellationToken)
+        public async Task<MediaFile> ConvertAsync(IInputArgument input, OutputFile output, CancellationToken cancellationToken)
             => await ConvertAsync(input, output, default, cancellationToken).ConfigureAwait(false);
 
-        public async Task<MediaFile> ConvertAsync(InputFile input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken)
+        public async Task<MediaFile> ConvertAsync(IInputArgument input, OutputFile output, ConversionOptions options, CancellationToken cancellationToken)
         {
             var parameters = new FFmpegParameters
             {

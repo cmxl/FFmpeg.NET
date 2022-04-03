@@ -1,6 +1,7 @@
 using FFmpeg.NET.Tests.Fixtures;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -85,7 +86,7 @@ namespace FFmpeg.NET.Tests
         public async Task FFmpeg_Can_Read_Video_Metadata()
         {
             var ffmpeg = new Engine(_fixture.FFmpegPath);
-            ffmpeg.Data += (s, e) => _output.WriteLine(e.Data);
+            ffmpeg.Data += (s, e) => _output.WriteLine(e.Data ?? string.Empty);
 
             var videoFile = _fixture.VideoFile;
             var metaData = await ffmpeg.GetMetaDataAsync(videoFile, default).ConfigureAwait(false);
@@ -150,6 +151,115 @@ namespace FFmpeg.NET.Tests
             Assert.NotNull(metaData);
             Assert.NotNull(metaData.AudioData);
             Assert.InRange(metaData.Duration.TotalHours, 30.0, 40.0);
+        }
+
+        [Fact]
+        public async Task FFmpeg_Read_Video_Metadata_Using_Stream_Input()
+        {
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
+            ffmpeg.Data += (s, e) => _output.WriteLine(e.Data ?? string.Empty);
+
+            var stream = new FileStream(_fixture.FlvVideoFile.FileInfo.FullName, FileMode.Open, FileAccess.Read);
+            await using var input = new StreamInput(stream, true);
+
+            var metaData = await ffmpeg.GetMetaDataAsync(input, CancellationToken.None); ;
+
+            Assert.Equal("h264 (High)", metaData.VideoData.Format);
+            Assert.Equal("yuv420p(progressive)", metaData.VideoData.ColorModel);
+            Assert.Equal("1280x720", metaData.VideoData.FrameSize);
+            Assert.Equal(25, metaData.VideoData.Fps);
+
+            Assert.NotNull(metaData.AudioData);
+            Assert.Equal("mp3", metaData.AudioData.Format);
+            Assert.Equal("48000 Hz", metaData.AudioData.SampleRate);
+            Assert.Equal("stereo", metaData.AudioData.ChannelOutput);
+            Assert.Equal(128, metaData.AudioData.BitRateKbs);
+
+            Assert.Equal(metaData.Duration, new TimeSpan(0, 0, 0, 5, 390));
+        }
+
+        [Fact]
+        public async Task FFmpeg_Read_Audio_Metadata_Using_Stream_Input()
+        {
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
+            ffmpeg.Data += (s, e) => _output.WriteLine(e.Data ?? string.Empty);
+
+            var stream = new FileStream(_fixture.AudioFile.FileInfo.FullName, FileMode.Open, FileAccess.Read);
+            await using var input = new StreamInput(stream, true);
+
+            var metaData = await ffmpeg.GetMetaDataAsync(input, CancellationToken.None);
+
+            Assert.NotNull(metaData);
+            Assert.NotNull(metaData.AudioData);
+            Assert.Equal("mp3", metaData.AudioData.Format);
+            Assert.Equal("44100 Hz", metaData.AudioData.SampleRate);
+            Assert.Equal("stereo", metaData.AudioData.ChannelOutput);
+            Assert.Equal(128, metaData.AudioData.BitRateKbs);
+            Assert.Null(metaData.VideoData);
+        }
+
+        [Fact]
+        public async Task FFmpeg_Read_Video_Metadata_Using_StandardInputWriter_Input()
+        {
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
+            ffmpeg.Data += (s, e) => _output.WriteLine(e.Data ?? string.Empty);
+
+            var videoFile = _fixture.FlvVideoFile;
+            var input = new StandardInputWriter();
+
+            var ffmpegTask = ffmpeg.GetMetaDataAsync(input, CancellationToken.None);
+            await PopulateStdInAsync(videoFile.FileInfo, input);
+            var metaData = await ffmpegTask;
+
+            Assert.Equal("h264 (High)", metaData.VideoData.Format);
+            Assert.Equal("yuv420p(progressive)", metaData.VideoData.ColorModel);
+            Assert.Equal("1280x720", metaData.VideoData.FrameSize);
+            Assert.Equal(25, metaData.VideoData.Fps);
+
+            Assert.NotNull(metaData.AudioData);
+            Assert.Equal("mp3", metaData.AudioData.Format);
+            Assert.Equal("48000 Hz", metaData.AudioData.SampleRate);
+            Assert.Equal("stereo", metaData.AudioData.ChannelOutput);
+            Assert.Equal(128, metaData.AudioData.BitRateKbs);
+
+            Assert.Equal(metaData.Duration, new TimeSpan(0, 0, 0, 5, 390));
+        }
+
+        [Fact]
+        public async Task FFmpeg_Read_Audio_Metadata_Using_StandardInputWriter_Input()
+        {
+            var ffmpeg = new Engine(_fixture.FFmpegPath);
+            ffmpeg.Data += (s, e) => _output.WriteLine(e.Data ?? string.Empty);
+
+            var audioFile = _fixture.AudioFile;
+            var input = new StandardInputWriter();
+
+            var ffmpegTask = ffmpeg.GetMetaDataAsync(input, CancellationToken.None);
+            await PopulateStdInAsync(audioFile.FileInfo, input);
+            var metaData = await ffmpegTask;
+
+            Assert.NotNull(metaData);
+            Assert.NotNull(metaData.AudioData);
+            Assert.Equal("mp3", metaData.AudioData.Format);
+            Assert.Equal("44100 Hz", metaData.AudioData.SampleRate);
+            Assert.Equal("stereo", metaData.AudioData.ChannelOutput);
+            Assert.Equal(128, metaData.AudioData.BitRateKbs);
+            Assert.Null(metaData.VideoData);
+        }
+
+        private async Task PopulateStdInAsync(FileInfo file, StandardInputWriter input)
+        {
+            await using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read);
+
+            var buffer = new byte[64 * 1024];
+            var bytesRead = 0;
+            do
+            {
+                bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                await input.WriteAsync(buffer, 0, bytesRead);
+            } while (bytesRead > 0 && input.IsOpen);
+
+            input.Close();
         }
     }
 }
