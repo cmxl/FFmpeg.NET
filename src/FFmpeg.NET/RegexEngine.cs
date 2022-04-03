@@ -14,7 +14,7 @@ namespace FFmpeg.NET
         /// <summary>
         ///     Dictionary containing every Regex test.
         /// </summary>
-        internal static readonly Dictionary<Find, Regex> _index = new()
+        internal static readonly Dictionary<Find, Regex> _index = new Dictionary<Find, Regex>()
         {
             { Find.BitRate, new Regex(@"([0-9]*)\s*kb/s") },
             { Find.ClipBitrate, new Regex(@"bitrate: ([0-9]*)\s*kb/s ") },
@@ -124,17 +124,17 @@ namespace FFmpeg.NET
 
         private static long? GetLongValue(Match match)
             => long.TryParse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
-                ? result
+                ? (long?)result
                 : null;
 
         private static double? GetDoubleValue(Match match)
             => double.TryParse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
-                ? result
+                ? (double?)result
                 : null;
 
         private static int? GetIntValue(Match match)
             => int.TryParse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
-                ? result
+                ? (int?)result
                 : null;
 
         public static void TestVideo(string data, FFmpegParameters engine)
@@ -163,7 +163,7 @@ namespace FFmpeg.NET
                     Fps = matchVideoFps[1].Success && !string.IsNullOrEmpty(matchVideoFps[1].ToString()) ? Convert.ToDouble(matchVideoFps[1].ToString(), new CultureInfo("en-US")) : 0,
                     BitRateKbs =
                         matchVideoBitRate.Success
-                            ? Convert.ToInt32(matchVideoBitRate.Groups[1].ToString())
+                            ? (int?)Convert.ToInt32(matchVideoBitRate.Groups[1].ToString())
                             : null
                 };
         }

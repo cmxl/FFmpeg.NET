@@ -47,7 +47,7 @@ namespace FFmpeg.NET
                 
                 var inputHandler = _parameters.Input as IProcessExecutionHandler;
 
-                if (inputHandler is not null)
+                if (inputHandler != null)
                 {
                     await inputHandler.HandleProcessStartedAsync(ffmpegProcess, cancellationToken).ConfigureAwait(false);
                 }
@@ -69,7 +69,7 @@ namespace FFmpeg.NET
                     throw;
                 }
 
-                if (inputHandler is not null)
+                if (inputHandler != null)
                 {
                     await inputHandler.HandleProcessExitedAsync(ffmpegProcess, cancellationToken).ConfigureAwait(false);
                 }
@@ -165,7 +165,7 @@ namespace FFmpeg.NET
             }
         }
 
-        private static ProcessStartInfo GenerateStartInfo(string ffmpegPath, string arguments) => new()
+        private static ProcessStartInfo GenerateStartInfo(string ffmpegPath, string arguments) => new ProcessStartInfo()
         {
             // -y overwrite output files
             Arguments = "-y " + arguments,

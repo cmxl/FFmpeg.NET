@@ -8,7 +8,7 @@
 
     public interface IInputArgument : IArgument, IHasMetaData
     {
-        bool UseStandardInput { get; }
+        public bool UseStandardInput { get { return false; } }
     }
 
     public interface IOutputArgument : IArgument

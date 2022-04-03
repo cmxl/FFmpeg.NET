@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>FFmpeg.NET</AssemblyName>
     <RootNamespace>FFmpeg.NET</RootNamespace>
     <Authors>Tobias Haimerl (cmxl)</Authors>
     <Company></Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Copyright>© 2021</Copyright>
+    <Copyright>© 2022</Copyright>
     <PackageProjectUrl>https://github.com/cmxl/FFmpeg.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cmxl/FFmpeg.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -15,11 +15,11 @@
     <PackageIcon>icon.png</PackageIcon>
     <Description>.NET wrapper for common ffmpeg tasks.</Description>
     <PackageId>xFFmpeg.NET</PackageId>
-    <Version>7.0.1</Version>
+    <Version>7.1.1</Version>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicense>LICENSE.md</PackageLicense>
-    <AssemblyVersion>7.0.1</AssemblyVersion>
-    <FileVersion>7.0.1</FileVersion>
+    <AssemblyVersion>7.1.1</AssemblyVersion>
+    <FileVersion>7.1.1</FileVersion>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
