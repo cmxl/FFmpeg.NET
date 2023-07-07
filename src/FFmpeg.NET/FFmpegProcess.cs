@@ -31,6 +31,7 @@ namespace FFmpeg.NET
             _caughtException = null;
             string arguments = FFmpegArgumentBuilder.Build(_parameters);
             ProcessStartInfo startInfo = GenerateStartInfo(_ffmpegFilePath, arguments);
+            startInfo.WorkingDirectory = _parameters.CurrentDir ?? "";
             await ExecuteAsync(startInfo, _parameters, cancellationToken).ConfigureAwait(false);
         }
 

@@ -143,12 +143,12 @@ namespace FFmpeg.NET
             Cleanup(ffmpegProcess);
         }
 
-        public async Task ExecuteAsync(string arguments, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(string arguments, CancellationToken cancellationToken, string currentDir = null)
         {
             var parameters = new FFmpegParameters
             {
                 CustomArguments = arguments,
-
+                CurrentDir = currentDir
             };
             await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
         }
