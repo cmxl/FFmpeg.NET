@@ -4,6 +4,7 @@
     {
         public bool HasCustomArguments => !string.IsNullOrWhiteSpace(CustomArguments);
         public string CustomArguments { get; set; }
+        public string CurrentDir { get; set; }
         public ConversionOptions ConversionOptions { get; set; }
         public FFmpegTask Task { get; set; }
         public IOutputArgument Output { get; set; }
