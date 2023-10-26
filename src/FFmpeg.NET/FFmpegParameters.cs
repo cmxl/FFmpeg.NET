@@ -8,5 +8,6 @@
         public FFmpegTask Task { get; set; }
         public IOutputArgument Output { get; set; }
         public IInputArgument Input { get; set; }
+        public string WorkingDirectory { get; set; }
     }
 }

@@ -148,10 +148,22 @@ namespace FFmpeg.NET
             var parameters = new FFmpegParameters
             {
                 CustomArguments = arguments,
-
             };
             await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
         }
+        
+        // if further overloads are needed
+        // it should be considered if ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken) should be made public
+        public async Task ExecuteAsync(string arguments, string workingDirectory, CancellationToken cancellationToken)
+        {
+            var parameters = new FFmpegParameters
+            {
+                CustomArguments = arguments,
+                WorkingDirectory = workingDirectory
+            };
+            await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
+        }
+
 
         private FFmpegProcess CreateProcess(FFmpegParameters parameters)
         {
