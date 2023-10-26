@@ -67,6 +67,7 @@ namespace FFmpeg.NET.Extensions
             if (!started)
                 tcs.TrySetException(new InvalidOperationException($"Could not start process {process}"));
 
+            process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
             return tcs.Task;
