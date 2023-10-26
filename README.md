@@ -67,8 +67,8 @@ Install [FFmpeg.NET](https://github.com/cmxl/FFmpeg.NET) from nuget.org Package 
 ### Grab thumbnail from a video
 
 ```csharp
-var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
-var outputFile = new MediaFile (@"C:\Path\To_Save_Image.jpg");
+var inputFile = new InputFile (@"C:\Path\To_Video.flv");
+var outputFile = new OutputFile (@"C:\Path\To_Save_Image.jpg");
 
 var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
 // Saves the frame located on the 15th second of the video.
@@ -79,7 +79,7 @@ await ffmpeg.GetThumbnailAsync(inputFile, outputFile, options);
 ### Retrieve metadata
 
 ```csharp
-var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
+var inputFile = new InputFile (@"C:\Path\To_Video.flv");
 
 var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
 var metadata = await ffmpeg.GetMetadataAsync(inputFile);
@@ -90,8 +90,8 @@ Console.WriteLine(metadata.Duration);
 ### Basic conversion
 
 ```csharp
-var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
-var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");
+var inputFile = new InputFile (@"C:\Path\To_Video.flv");
+var outputFile = new OutputFile (@"C:\Path\To_Save_New_Video.mp4");
 
 var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
 await ffmpeg.ConvertAsync(inputFile, outputFile);
@@ -100,8 +100,8 @@ await ffmpeg.ConvertAsync(inputFile, outputFile);
 ### Convert Flash video to DVD
 
 ```csharp
-var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
-var outputFile = new MediaFile (@"C:\Path\To_Save_New_DVD.vob");
+var inputFile = new InputFile (@"C:\Path\To_Video.flv");
+var outputFile = new OutputFile (@"C:\Path\To_Save_New_DVD.vob");
 
 var conversionOptions = new ConversionOptions
 {
@@ -116,8 +116,8 @@ await ffmpeg.ConvertAsync(inputFile, outputFile, conversionOptions);
 ### Transcoding options FLV to MP4
 
 ```csharp
-var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
-var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");
+var inputFile = new InputFile (@"C:\Path\To_Video.flv");
+var outputFile = new OutputFile (@"C:\Path\To_Save_New_Video.mp4");
 
 var conversionOptions = new ConversionOptions
 {
@@ -134,8 +134,8 @@ await ffmpeg.ConvertAsync(inputFile, outputFile, conversionOptions);
 ### Cut video down to smaller length
 
 ```csharp
-var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
-var outputFile = new MediaFile (@"C:\Path\To_Save_ExtractedVideo.flv");
+var inputFile = new InputFile (@"C:\Path\To_Video.flv");
+var outputFile = new OutputFile (@"C:\Path\To_Save_ExtractedVideo.flv");
 
 var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
 var options = new ConversionOptions();
@@ -153,8 +153,8 @@ await ffmpeg.ConvertAsync(inputFile, outputFile, options);
 ```csharp
 public async Task StartConverting()
 {
-    var inputFile = new MediaFile (@"C:\Path\To_Video.flv");
-    var outputFile = new MediaFile (@"C:\Path\To_Save_New_Video.mp4");
+    var inputFile = new InputFile (@"C:\Path\To_Video.flv");
+    var outputFile = new OutputFile (@"C:\Path\To_Save_New_Video.mp4");
 
     var ffmpeg = new Engine("C:\\ffmpeg\\ffmpeg.exe");
     ffmpeg.Progress += OnProgress;
