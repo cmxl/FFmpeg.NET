@@ -78,6 +78,10 @@ namespace FFmpeg.NET
             {
                 task?.Dispose();
                 ffmpegProcess.ErrorDataReceived -= OnDataHandler;
+                // if for some reason the task has not yet finished we just kill it
+                // could also happen when CancellationToken got cancelled
+                if(!ffmpegProcess.HasExited)
+                    try { ffmpegProcess.Kill(); } catch { /* ignore */ }
             }
 
 
