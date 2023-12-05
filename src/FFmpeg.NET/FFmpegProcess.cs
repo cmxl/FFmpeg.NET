@@ -111,7 +111,7 @@ namespace FFmpeg.NET
 
 		private static string GetExceptionMessage(List<string> messages)
 			=> messages.Count > 1
-				? messages[1] + messages[0]
+				? $"{messages[1]}{Environment.NewLine}{messages[0]}"
 				: string.Join(string.Empty, messages);
 
 
