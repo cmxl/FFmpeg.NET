@@ -31,6 +31,11 @@ namespace FFmpeg.NET
         public event EventHandler<ConversionCompleteEventArgs> Complete;
         public event EventHandler<ConversionDataEventArgs> Data;
 
+
+        // ---------------------------------------------------------
+        // Wrapper methods for ease of use
+        // ---------------------------------------------------------
+
         public async Task<MetaData> GetMetaDataAsync(IInputArgument mediaFile, CancellationToken cancellationToken)
         {
             var parameters = new FFmpegParameters
@@ -87,83 +92,82 @@ namespace FFmpeg.NET
 
         public async Task ConvertAsync(IInputArgument input, Stream output, ConversionOptions options, CancellationToken cancellationToken)
         {
-            var pipeName = $"{_pipePrefix}{Guid.NewGuid()}";
             var parameters = new FFmpegParameters
             {
                 Task = FFmpegTask.Convert,
                 Input = input,
-                Output = new OutputPipe(GetPipePath(pipeName)),
                 ConversionOptions = options
             };
-
-            var process = CreateProcess(parameters);
-            var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-
-            await pipe.WaitForConnectionAsync(cancellationToken);
-            await Task.WhenAll(
-                pipe.CopyToAsync(output, cancellationToken),
-                process.ExecuteAsync(cancellationToken).ContinueWith(x =>
-                {
-                    pipe.Disconnect();
-                    pipe.Dispose();
-                }, cancellationToken)
-            ).ConfigureAwait(false);
-            Cleanup(process);
+            await ExecuteAsync(parameters, output, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task ConvertAsync(IArgument argument, Stream output, CancellationToken cancellationToken)
         {
-            var outputPipeName = $"{_pipePrefix}{Guid.NewGuid()}";
-            var outputArgument = new OutputPipe(GetPipePath(outputPipeName));
-            var pipe = new NamedPipeServerStream(outputPipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-
-            var arguments = argument.Argument + $" {outputArgument.Argument}";
-            var parameters = new FFmpegParameters { CustomArguments = arguments };
-            var process = CreateProcess(parameters);
-
-            await Task.WhenAll(
-                pipe.WaitForConnectionAsync(cancellationToken).ContinueWith(async x =>
-                {
-                    await pipe.CopyToAsync(output, cancellationToken);
-                }),
-                process.ExecuteAsync(cancellationToken).ContinueWith(x =>
-                {
-                    pipe.Disconnect();
-                    pipe.Dispose();
-                }, cancellationToken)
-            ).ConfigureAwait(false);
-
-            Cleanup(process);
-        }
-
-        private async Task ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken)
-        {
-            var ffmpegProcess = CreateProcess(parameters);
-            await ffmpegProcess.ExecuteAsync(cancellationToken).ConfigureAwait(false);
-            Cleanup(ffmpegProcess);
+            var parameters = new FFmpegParameters
+            {
+                Task = FFmpegTask.Execute,
+                CustomArguments = argument.Argument
+            };
+            await ExecuteAsync(parameters, output, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task ExecuteAsync(string arguments, CancellationToken cancellationToken)
         {
             var parameters = new FFmpegParameters
             {
+                Task = FFmpegTask.Execute,
                 CustomArguments = arguments,
             };
             await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
         }
         
-        // if further overloads are needed
-        // it should be considered if ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken) should be made public
         public async Task ExecuteAsync(string arguments, string workingDirectory, CancellationToken cancellationToken)
         {
             var parameters = new FFmpegParameters
             {
+                Task = FFmpegTask.Execute,
                 CustomArguments = arguments,
                 WorkingDirectory = workingDirectory
             };
             await ExecuteAsync(parameters, cancellationToken).ConfigureAwait(false);
         }
 
+        // ---------------------------------------------------------
+        // Basic API to call ffmpeg
+        // ---------------------------------------------------------
+
+        public async Task ExecuteAsync(FFmpegParameters parameters, CancellationToken cancellationToken)
+        {
+            var ffmpegProcess = CreateProcess(parameters);
+            await ffmpegProcess.ExecuteAsync(cancellationToken).ConfigureAwait(false);
+            Cleanup(ffmpegProcess);
+        }
+
+        public async Task ExecuteAsync(FFmpegParameters parameters, Stream output, CancellationToken cancellationToken)
+        {
+            var outputPipeName = $"{_pipePrefix}{Guid.NewGuid()}";
+            var outputArgument = new OutputPipe(GetPipePath(outputPipeName));
+            var pipe = new NamedPipeServerStream(outputPipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+
+            parameters.Output = outputArgument;
+            var ffmpegProcess = CreateProcess(parameters);
+            try
+            {
+                var executeProcess = ffmpegProcess.ExecuteAsync(cancellationToken);
+                var copyData = pipe.WaitForConnectionAsync(cancellationToken)
+                    .ContinueWith(async x =>
+                    {
+                        await pipe.CopyToAsync(output, cancellationToken);
+                    }, cancellationToken).Unwrap();
+                await Task.WhenAll(executeProcess, copyData).ConfigureAwait(false);
+                pipe.Disconnect();
+            }
+            finally
+            {
+                pipe.Dispose();
+                Cleanup(ffmpegProcess);
+            }
+        }
 
         private FFmpegProcess CreateProcess(FFmpegParameters parameters)
         {

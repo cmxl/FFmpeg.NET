@@ -9,14 +9,12 @@ namespace FFmpeg.NET
     {
         public static string Build(FFmpegParameters parameters)
         {
-            if (parameters.HasCustomArguments)
-                return parameters.CustomArguments;
-
             return parameters.Task switch
             {
                 FFmpegTask.Convert => Convert(parameters.Input, parameters.Output, parameters.ConversionOptions),
                 FFmpegTask.GetMetaData => GetMetadata(parameters.Input),
                 FFmpegTask.GetThumbnail => GetThumbnail(parameters.Input, parameters.Output, parameters.ConversionOptions),
+                FFmpegTask.Execute => Execute(parameters.Input, parameters.Output, parameters.CustomArguments),
                 _ => throw new ArgumentOutOfRangeException(),
             };
         }
@@ -180,6 +178,28 @@ namespace FFmpeg.NET
                 commandBuilder.AppendFormat(" {0} ", conversionOptions.ExtraArguments);
 
             return commandBuilder.AppendFormat(" {0} ", output.Argument).ToString();
+        }
+
+        private static string Execute(IInputArgument input, IOutputArgument output, string customArguments)
+        {
+            StringBuilder commandBuilder = new StringBuilder();
+            commandBuilder.Append(customArguments);
+
+            if (input != null)
+            {
+                if (input.UseStandardInput)
+                {
+                    commandBuilder.Append(" -nostdin ");
+                }
+                commandBuilder.Append($" -i {input.Argument} ");
+            }
+
+            if (output != null)
+            {
+                commandBuilder.Append($" {output.Argument} ");
+            }
+
+            return commandBuilder.ToString();
         }
 
         private static void AppendHWAccelOutputFormat(StringBuilder commandBuilder, ConversionOptions conversionOptions)

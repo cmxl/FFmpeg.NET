@@ -4,6 +4,7 @@
     {
         Convert,
         GetMetaData,
-        GetThumbnail
+        GetThumbnail,
+        Execute
     }
 }
