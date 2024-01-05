@@ -191,12 +191,12 @@ namespace FFmpeg.NET
                 {
                     commandBuilder.Append(" -nostdin ");
                 }
-                commandBuilder.Append($" -i {input.Argument}");
+                commandBuilder.Append($" -i {input.Argument} ");
             }
 
             if (output != null)
             {
-                commandBuilder.Append($"{output.Argument}");
+                commandBuilder.Append($" {output.Argument} ");
             }
 
             return commandBuilder.ToString();
