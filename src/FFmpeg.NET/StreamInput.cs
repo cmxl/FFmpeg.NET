@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace FFmpeg.NET
 {
+#if NETSTANDARD2_1_OR_GREATER
     public class StreamInput : IInputArgument, IProcessExecutionHandler, IDisposable, IAsyncDisposable
+#else
+    public class StreamInput : IInputArgument, IProcessExecutionHandler, IDisposable
+#endif
     {
         private const int ChannelClosedHResult = -2147024787;
         private const int ReadBufferSize = 64 * 1024; // 64Kb
@@ -83,6 +87,7 @@ namespace FFmpeg.NET
             }
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         public async ValueTask DisposeAsync()
         {
             if (_disposeStream)
@@ -90,6 +95,7 @@ namespace FFmpeg.NET
                 await _stream.DisposeAsync();
             }
         }
+#endif
 
         private static void Close(Process process)
         {

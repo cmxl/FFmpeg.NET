@@ -33,9 +33,27 @@ namespace FFmpeg.NET
 
         public async Task WriteAsync(byte[] data, int offset, int count, CancellationToken cancellationToken = default)
         {
-            await WriteAsync(new ReadOnlyMemory<byte>(data, offset, count), cancellationToken).ConfigureAwait(false);
+            if (_process is null || _process.HasExited)
+            {
+                return;
+            }
+
+            try
+            {
+                var inputStream = _process.StandardInput.BaseStream;
+                await inputStream.WriteAsync(data, offset, count, cancellationToken).ConfigureAwait(false);
+            }
+            catch (IOException ioException) when (ioException.HResult == ChannelClosedHResult)
+            {
+                // If input stream has already closed, ignore it.
+            }
+            catch (InvalidOperationException)
+            {
+                // If the process doesn't exist anymore, ignore it.
+            }
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         public async Task WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
         {
             if (_process is null || _process.HasExited)
@@ -57,6 +75,7 @@ namespace FFmpeg.NET
                 // If the process doesn't exist anymore, ignore it.
             }
         }
+#endif
 
         public void Close()
         {

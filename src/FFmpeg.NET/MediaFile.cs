@@ -29,6 +29,7 @@ namespace FFmpeg.NET
 
         public string Name => FileInfo.FullName;
         public string Argument => $"\"{FileInfo.FullName}\"";
+        public bool UseStandardInput => false;
     }
 
     public class OutputFile : MediaFile, IOutputArgument
@@ -68,7 +69,9 @@ namespace FFmpeg.NET
 
         public string PipePath { get; }
 
+        public string Name => PipePath;
         public string Argument => $"\"{PipePath}\"";
+        public bool UseStandardInput => false;
         public MetaData MetaData { get; set; }
     }
 }
