@@ -27,6 +27,7 @@ namespace FFmpeg.NET.Events
         public IOutputArgument Output { get; }
         public IInputArgument Input { get; }
         public MediaInfo MediaInfo{ get; }
+        public string FFmpegVersion { get; init; }
 
         public override string ToString()
             => $"[{Input?.Name} => {Output?.Name}]\nFrame: {Frame}\nFps: {Fps}\nSize: {SizeKb}kb\nProcessedDuration: {ProcessedDuration}\nBitrate: {Bitrate}\nTotalDuration: {TotalDuration}";

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
     <AssemblyName>FFmpeg.NET</AssemblyName>
     <RootNamespace>FFmpeg.NET</RootNamespace>
     <Authors>Tobias Haimerl (cmxl)</Authors>

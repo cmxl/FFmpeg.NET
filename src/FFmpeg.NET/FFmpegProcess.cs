@@ -17,6 +17,7 @@ namespace FFmpeg.NET
 		private Exception _caughtException;
 
 		private MediaInfo _mediaInfo;
+		private string _ffmpegVersion;
 		private List<string> _messages;
 
 		public FFmpegProcess(FFmpegParameters parameters, string ffmpegFilePath)
@@ -86,12 +87,14 @@ namespace FFmpeg.NET
 			if (_caughtException != null || ffmpegProcess.ExitCode != 0)
 				OnException(_messages, parameters, ffmpegProcess.ExitCode, _caughtException);
 			else
-				OnConversionCompleted(new ConversionCompleteEventArgs(parameters.Input, parameters.Output));
+				OnConversionCompleted(new ConversionCompleteEventArgs(parameters.Input, parameters.Output) { FFmpegVersion = _ffmpegVersion });
 		}
 
 		private void OnDataHandler(object sender, DataReceivedEventArgs e)
 		{
-			OnData(new ConversionDataEventArgs(e.Data, _parameters.Input, _parameters.Output));
+			if (e.Data != null)
+				TryUpdateVersion(e.Data);
+			OnData(new ConversionDataEventArgs(e.Data, _parameters.Input, _parameters.Output) { FFmpegVersion = _ffmpegVersion });
 			FFmpegProcessOnErrorDataReceived(e, _parameters, ref _caughtException, _messages);
 		}
 
@@ -102,11 +105,17 @@ namespace FFmpeg.NET
 					_mediaInfo = newMediaInfo;
 		}
 
+		private void TryUpdateVersion(string data)
+		{
+			if (_ffmpegVersion == null)
+				RegexEngine.IsVersionData(data, out _ffmpegVersion);
+		}
+
 		private void OnException(List<string> messages, FFmpegParameters parameters, int exitCode, Exception caughtException)
 		{
 			var exceptionMessage = GetExceptionMessage(messages);
 			var exception = new FFmpegException(exceptionMessage, caughtException, exitCode);
-			OnConversionError(new ConversionErrorEventArgs(exception, parameters.Input, parameters.Output));
+			OnConversionError(new ConversionErrorEventArgs(exception, parameters.Input, parameters.Output) { FFmpegVersion = _ffmpegVersion });
 		}
 
 		private static string GetExceptionMessage(List<string> messages)
@@ -149,7 +158,7 @@ namespace FFmpeg.NET
 				{
 					if (parameters.Input != null) progressData.TotalDuration = parameters.Input.MetaData?.Duration ?? totalMediaDuration;
 
-					OnProgressChanged(new ConversionProgressEventArgs(progressData, parameters.Input, parameters.Output, _mediaInfo));
+					OnProgressChanged(new ConversionProgressEventArgs(progressData, parameters.Input, parameters.Output, _mediaInfo) { FFmpegVersion = _ffmpegVersion });
 				}
 			}
 			catch (Exception ex)

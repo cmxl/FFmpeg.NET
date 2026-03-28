@@ -302,12 +302,12 @@ private void OnData(object sender, ConversionDataEventArgs e)
 
 private void OnComplete(object sender, ConversionCompleteEventArgs e)
 {
-    Console.WriteLine("Completed conversion from {0} to {1}", e.Input.Name, e.Output.Name);
+    Console.WriteLine("Completed conversion from {0} to {1} (ffmpeg {2})", e.Input.Name, e.Output.Name, e.FFmpegVersion);
 }
 
 private void OnError(object sender, ConversionErrorEventArgs e)
 {
-    Console.WriteLine("[{0} => {1}]: Error: {2}\n{3}", e.Input.Name, e.Output.Name, e.Exception.ExitCode, e.Exception.InnerException);
+    Console.WriteLine("[{0} => {1}]: Error: {2} (ffmpeg {3})\n{4}", e.Input.Name, e.Output.Name, e.Exception.ExitCode, e.FFmpegVersion, e.Exception.InnerException);
 }
 ```
 

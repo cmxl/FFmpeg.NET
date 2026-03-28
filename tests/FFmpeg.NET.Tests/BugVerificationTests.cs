@@ -37,7 +37,12 @@ namespace FFmpeg.NET.Tests
             var outputStream = new MemoryStream();
 
             bool dataEventFired = false;
-            engine.Data += (s, e) => dataEventFired = true;
+            string ffmpegVersion = null;
+            engine.Data += (s, e) =>
+            {
+                dataEventFired = true;
+                ffmpegVersion ??= e.FFmpegVersion;
+            };
 
             await engine.ConvertAsync(_fixture.VideoFile, outputStream, options, CancellationToken.None);
 
@@ -45,6 +50,8 @@ namespace FFmpeg.NET.Tests
 
             Assert.True(outputStream.Length > 0, "Pipe conversion should produce output data");
             Assert.True(dataEventFired, "Engine Data events should fire during conversion");
+            Assert.NotNull(ffmpegVersion);
+            Assert.NotEmpty(ffmpegVersion);
         }
 
         /// <summary>
@@ -83,7 +90,12 @@ namespace FFmpeg.NET.Tests
             var input = _fixture.VideoFile;
 
             FFmpegException capturedException = null;
-            engine.Error += (s, e) => capturedException = e.Exception;
+            string ffmpegVersion = null;
+            engine.Error += (s, e) =>
+            {
+                capturedException = e.Exception;
+                ffmpegVersion = e.FFmpegVersion;
+            };
 
             await engine.ConvertAsync(input, output, default);
 
@@ -94,6 +106,8 @@ namespace FFmpeg.NET.Tests
 
             // The two stderr lines should now be separated by a newline
             Assert.Contains(Environment.NewLine, capturedException.Message);
+            Assert.NotNull(ffmpegVersion);
+            Assert.NotEmpty(ffmpegVersion);
         }
 
         /// <summary>
