@@ -103,13 +103,21 @@ namespace FFmpeg.NET
             {
                 var processTask = process.ExecuteAsync(cancellationToken);
                 await pipe.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
+#if NETSTANDARD2_1_OR_GREATER
                 await pipe.CopyToAsync(output, cancellationToken).ConfigureAwait(false);
+#else
+                await pipe.CopyToAsync(output, 81920, cancellationToken).ConfigureAwait(false);
+#endif
                 await processTask.ConfigureAwait(false);
             }
             finally
             {
                 try { if (pipe.IsConnected) pipe.Disconnect(); } catch { }
+#if NETSTANDARD2_1_OR_GREATER
                 await pipe.DisposeAsync().ConfigureAwait(false);
+#else
+                pipe.Dispose();
+#endif
                 Cleanup(process);
             }
         }
@@ -128,13 +136,21 @@ namespace FFmpeg.NET
             {
                 var processTask = process.ExecuteAsync(cancellationToken);
                 await pipe.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
+#if NETSTANDARD2_1_OR_GREATER
                 await pipe.CopyToAsync(output, cancellationToken).ConfigureAwait(false);
+#else
+                await pipe.CopyToAsync(output, 81920, cancellationToken).ConfigureAwait(false);
+#endif
                 await processTask.ConfigureAwait(false);
             }
             finally
             {
                 try { if (pipe.IsConnected) pipe.Disconnect(); } catch { }
+#if NETSTANDARD2_1_OR_GREATER
                 await pipe.DisposeAsync().ConfigureAwait(false);
+#else
+                pipe.Dispose();
+#endif
                 Cleanup(process);
             }
         }

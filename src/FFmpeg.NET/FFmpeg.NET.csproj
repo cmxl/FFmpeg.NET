@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>9.0</LangVersion>
     <AssemblyName>FFmpeg.NET</AssemblyName>
     <RootNamespace>FFmpeg.NET</RootNamespace>
@@ -12,12 +12,12 @@
     <PackageProjectUrl>https://github.com/cmxl/FFmpeg.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cmxl/FFmpeg.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>ffmpeg, dotnet, netstandard2.1</PackageTags>
+    <PackageTags>ffmpeg, dotnet, netstandard2.0, netstandard2.1</PackageTags>
     <Description>.NET wrapper for common ffmpeg tasks.</Description>
     <PackageId>xFFmpeg.NET</PackageId>
-    <Version>7.3.0</Version>
-    <AssemblyVersion>7.3.0</AssemblyVersion>
-    <FileVersion>7.3.0</FileVersion>
+    <Version>7.4.0</Version>
+    <AssemblyVersion>7.4.0</AssemblyVersion>
+    <FileVersion>7.4.0</FileVersion>
     <OutputType>Library</OutputType>
     <StartupObject />
 	<ApplicationIcon />

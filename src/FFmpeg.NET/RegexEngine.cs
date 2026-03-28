@@ -114,7 +114,7 @@ namespace FFmpeg.NET
             var end = str.IndexOf(':', start);
             if (end < 0)
                 return false;
-            if (!int.TryParse(str[start..end], out var hours))
+            if (!int.TryParse(str.Substring(start, end - start), out var hours))
                 return false;
 
             // Process minutes
@@ -122,13 +122,13 @@ namespace FFmpeg.NET
             end = str.IndexOf(':', start);
             if (end < 0)
                 return false;
-            if (!int.TryParse(str[start..end], out var minutes))
+            if (!int.TryParse(str.Substring(start, end - start), out var minutes))
                 return false;
 
             // Process seconds
             start = end + 1;
             // ffmpeg doesnt respect the computers culture
-            if (!double.TryParse(str[start..], NumberStyles.Number, CultureInfo.InvariantCulture, out var seconds))
+            if (!double.TryParse(str.Substring(start), NumberStyles.Number, CultureInfo.InvariantCulture, out var seconds))
                 return false;
 
             result = new TimeSpan(0, hours, minutes, 0, (int)Math.Round(seconds * 1000.0));

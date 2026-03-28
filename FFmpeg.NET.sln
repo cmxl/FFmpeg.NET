@@ -1,3 +1,4 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
@@ -32,6 +33,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{745ED296-E6B5-4ADA-81D0-0A25374BCF8C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFmpeg.NET.Sample", "samples\FFmpeg.NET.Sample\FFmpeg.NET.Sample.csproj", "{F19B89F2-66E5-4A38-B75A-3CC7B8C72B59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFmpeg.NET.CompatTests", "tests\FFmpeg.NET.CompatTests\FFmpeg.NET.CompatTests.csproj", "{074DF6EA-4132-4259-A58A-35A0E11FB15D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +82,18 @@ Global
 		{F19B89F2-66E5-4A38-B75A-3CC7B8C72B59}.Release|x64.Build.0 = Release|Any CPU
 		{F19B89F2-66E5-4A38-B75A-3CC7B8C72B59}.Release|x86.ActiveCfg = Release|Any CPU
 		{F19B89F2-66E5-4A38-B75A-3CC7B8C72B59}.Release|x86.Build.0 = Release|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Debug|x64.Build.0 = Debug|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Debug|x86.Build.0 = Debug|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Release|x64.ActiveCfg = Release|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Release|x64.Build.0 = Release|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Release|x86.ActiveCfg = Release|Any CPU
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +104,7 @@ Global
 		{B502D2D6-8F63-4359-9531-2E48E635DBD0} = {5CBF35BC-014C-4608-8E6C-A3EB7A087B82}
 		{8831CF40-BEB6-4760-982D-9B9C8CEDE717} = {B502D2D6-8F63-4359-9531-2E48E635DBD0}
 		{F19B89F2-66E5-4A38-B75A-3CC7B8C72B59} = {745ED296-E6B5-4ADA-81D0-0A25374BCF8C}
+		{074DF6EA-4132-4259-A58A-35A0E11FB15D} = {31CA4F16-6E17-4D54-8149-F11EB7794A6D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD084B74-E89E-4E1D-84D2-38383B7616EE}
