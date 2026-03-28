@@ -110,6 +110,32 @@ namespace FFmpeg.NET.Tests
         }
 
         [Theory]
+        [InlineData("ffmpeg version 4.4.2 Copyright (c) 2000-2021 the FFmpeg developers", "4.4.2")]
+        [InlineData("ffmpeg version 6.1.1 Copyright (c) 2000-2023 the FFmpeg developers", "6.1.1")]
+        [InlineData("ffmpeg version N-112057-g880c1cd Copyright (c) 2000-2023 the FFmpeg developers", "N-112057-g880c1cd")]
+        [InlineData("ffmpeg version 2024-01-15-git-5765aeb592-full_build-www.gyan.dev Copyright (c) 2000-2024 the FFmpeg developers", "2024-01-15-git-5765aeb592-full_build-www.gyan.dev")]
+        public void RegexEngine_Can_Parse_Version(string data, string expectedVersion)
+        {
+            var result = RegexEngine.IsVersionData(data, out var version);
+
+            Assert.True(result);
+            Assert.Equal(expectedVersion, version);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("Duration: 00:00:05.31, start: 0.000000, bitrate: 1589 kb/s")]
+        [InlineData("Stream #0:0(und): Video: h264")]
+        public void RegexEngine_Returns_False_For_NonVersion_Data(string data)
+        {
+            var result = RegexEngine.IsVersionData(data, out var version);
+
+            Assert.False(result);
+            Assert.Null(version);
+        }
+
+        [Theory]
         [InlineData("Stream #0:0(und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p, 1280x720 [SAR 1:1 DAR 16:9], 1205 kb/s, 25 fps, 25 tbr, 12800 tbn, 50 tbc (default)", 1205, "yuv420p", "1280x720", "h264 (Main) (avc1 / 0x31637661)")]
         [InlineData("Stream #0:0(und): Video: hevc (Main 10) (hvc1 / 0x31637668), yuv420p10le(tv, bt2020/arib-std-b67, progressive), 1920x1080, 8517 kb/s, 29.98 fps, 29.97 tbr, 600 tbn, 600 tbc (default)", 8517, "yuv420p10le(tv, bt2020/arib-std-b67, progressive)", "1920x1080", "hevc (Main 10) (hvc1 / 0x31637668)")]
         public void RegexEngine_Can_Read_Video_MetaData(string data, int bitrate, string colorModel, string frameSize, string format)

@@ -15,5 +15,6 @@ namespace FFmpeg.NET.Events
         public FFmpegException Exception { get; }
         public IInputArgument Input { get; }
         public IOutputArgument Output { get; }
+        public string FFmpegVersion { get; init; }
     }
 }

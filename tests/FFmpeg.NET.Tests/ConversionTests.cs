@@ -69,6 +69,8 @@ namespace FFmpeg.NET.Tests
             Assert.Equal(e.Sender, ffmpeg);
             Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.Name);
             Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.Name);
+            Assert.NotNull(e.Arguments.FFmpegVersion);
+            Assert.NotEmpty(e.Arguments.FFmpegVersion);
         }
 
         [Fact]
@@ -89,6 +91,8 @@ namespace FFmpeg.NET.Tests
             Assert.Equal(input, e.Arguments.Input);
             Assert.Equal(output, e.Arguments.Output);
             Assert.Equal(1, e.Arguments.Exception.ExitCode);
+            Assert.NotNull(e.Arguments.FFmpegVersion);
+            Assert.NotEmpty(e.Arguments.FFmpegVersion);
         }
 
         [Fact]
@@ -139,6 +143,8 @@ namespace FFmpeg.NET.Tests
             Assert.Equal(e.Sender, ffmpeg);
             Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.Name);
             Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.Name);
+            Assert.NotNull(e.Arguments.FFmpegVersion);
+            Assert.NotEmpty(e.Arguments.FFmpegVersion);
         }
 
         [Fact]
@@ -161,6 +167,8 @@ namespace FFmpeg.NET.Tests
             Assert.Equal(e.Sender, ffmpeg);
             Assert.Equal(_fixture.VideoFile.FileInfo.FullName, e.Arguments.Input.Name);
             Assert.Equal(output.FileInfo.FullName, e.Arguments.Output.Name);
+            Assert.NotNull(e.Arguments.FFmpegVersion);
+            Assert.NotEmpty(e.Arguments.FFmpegVersion);
         }
 
         [Fact]

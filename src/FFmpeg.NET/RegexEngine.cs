@@ -29,7 +29,8 @@ namespace FFmpeg.NET
             { Find.AudioFormatHzChannel, new Regex(@"Audio:\s*([^,]*),\s([^,]*),\s([^,]*)") },
             { Find.MetaVideo, new Regex(@"(Stream\s*#[0-9]*:[0-9]*\(?[^\)]*?\)?: Video:.*)") },
             { Find.VideoFormatColorSize, new Regex(@"Video:\s*([^,]*),\s*((?:[^,]*,?[^,]*?)(?:\(.*\))?),\s*(?=[0-9]*x[0-9]*)([0-9]*x[0-9]*)") },
-            { Find.VideoFps, new Regex(@"([0-9\.]*)\s*tbr") }
+            { Find.VideoFps, new Regex(@"([0-9\.]*)\s*tbr") },
+            { Find.Version, new Regex(@"^ffmpeg version\s+(\S+)") }
         };
 
         /// <summary>
@@ -65,6 +66,18 @@ namespace FFmpeg.NET
 
             return true;
         }
+        public static bool IsVersionData(string data, out string version)
+        {
+            version = null;
+            if (string.IsNullOrEmpty(data)) return false;
+
+            var match = _index[Find.Version].Match(data);
+            if (!match.Success) return false;
+
+            version = match.Groups[1].Value;
+            return true;
+        }
+
         internal static bool IsMediaInfo(string data, out MediaInfo mediaInfo)
         {
             mediaInfo = null;
@@ -208,7 +221,8 @@ namespace FFmpeg.NET
             MetaVideo,
             BitRate,
             VideoFormatColorSize,
-            VideoFps
+            VideoFps,
+            Version
         }
     }
 }
