@@ -253,6 +253,11 @@ namespace FFmpeg.NET
             if (conversionOptions.VideoCodec != VideoCodec.Default)
             {
                 var codec = conversionOptions.VideoCodec.ToString().ToLowerInvariant();
+                if (codec.StartsWith("_"))
+                    codec = codec.Replace("_", "");
+                if (codec.Contains("_"))
+                    codec = codec.Replace("_", "-");
+
                 commandBuilder.AppendFormat(" -vcodec {0} ", codec);
             }
             return commandBuilder;
@@ -265,6 +270,8 @@ namespace FFmpeg.NET
                 var format = conversionOptions.VideoFormat.ToString().ToLowerInvariant();
                 if (format.StartsWith("_"))
                     format = format.Replace("_", "");
+                if (format.Contains("_"))
+                    format = format.Replace("_", "-");
 
                 commandBuilder.AppendFormat(" -f {0} ", format);
             }
